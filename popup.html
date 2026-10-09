@@ -60,6 +60,15 @@
   input::placeholder { color: #5d626c; }
   input:focus, select:focus { border-color: var(--gold-2); box-shadow: 0 0 0 3px #f2c45a22; }
   .row { display: grid; grid-template-columns: 70px 1fr; gap: 8px; }
+  /* Realm autocomplete */
+  .ac { position: relative; }
+  .suggest {
+    position: absolute; z-index: 10; top: calc(100% + 4px); left: 0; right: 0; margin: 0; padding: 4px;
+    list-style: none; background: var(--panel-2); border: 1px solid #3a404c; border-radius: 8px;
+    box-shadow: 0 8px 24px #0009;
+  }
+  .suggest li { padding: 6px 8px; border-radius: 5px; cursor: pointer; }
+  .suggest li:hover, .suggest li.on { background: #f2c45a1f; color: var(--gold); }
   .primary {
     width: 100%; margin-top: 12px; padding: 8px; border: 0; border-radius: 7px; cursor: pointer;
     font: inherit; font-weight: 600; color: #1a1408;
@@ -174,8 +183,10 @@
     </div>
     <div>
       <label for="realm" data-i18n="realm"></label>
-      <input id="realm" data-i18n-ph="realmPh" list="realmList" autocomplete="off">
-      <datalist id="realmList"></datalist>
+      <div class="ac">
+        <input id="realm" data-i18n-ph="realmPh" autocomplete="off">
+        <ul class="suggest" id="realmSuggest" hidden></ul>
+      </div>
     </div>
   </div>
   <label for="name" data-i18n="name"></label>

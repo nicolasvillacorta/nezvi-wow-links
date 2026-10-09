@@ -251,18 +251,54 @@ $("save").onclick = () => {
   chrome.storage.sync.set({ char: c }, () => { char = c; show("links"); refreshProfile(); });
 };
 
-// Realm suggestions while typing, filtered by the selected region
-let realmTimer;
+// Realm suggestions while typing, filtered by the selected region.
+// A custom list instead of <datalist>, which doesn't open by itself when results arrive late
+let realmTimer, realmActive = -1;
+const suggest = $("realmSuggest");
+const suggestItems = () => [...suggest.children];
+
+function closeSuggest() { suggest.hidden = true; suggest.innerHTML = ""; realmActive = -1; }
+
+function highlight(i) {
+  realmActive = i;
+  suggestItems().forEach((li, j) => li.classList.toggle("on", j === i));
+}
+
+function pickRealm(name) { $("realm").value = name; closeSuggest(); $("name").focus(); }
+
 $("realm").addEventListener("input", () => {
   clearTimeout(realmTimer);
   const term = $("realm").value.trim();
-  if (term.length < 2) return;
+  if (term.length < 2) return closeSuggest();
   realmTimer = setTimeout(async () => {
     const realms = await searchRealms(term, $("region").value);
     if ($("realm").value.trim() !== term) return; // The user kept typing
-    $("realmList").innerHTML = realms.map(r => `<option value="${r.replace(/"/g, "&quot;")}">`).join("");
+    const options = realms.filter(r => r.toLowerCase() !== term.toLowerCase()).slice(0, 6);
+    if (!options.length) return closeSuggest();
+    suggest.innerHTML = options.map(r => `<li>${r.replace(/</g, "&lt;")}</li>`).join("");
+    suggest.hidden = false;
+    realmActive = -1;
   }, 250);
 });
+
+$("realm").addEventListener("keydown", e => {
+  if (suggest.hidden) return;
+  const n = suggestItems().length;
+  if (e.key === "ArrowDown") { e.preventDefault(); highlight((realmActive + 1) % n); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); highlight((realmActive - 1 + n) % n); }
+  else if (e.key === "Enter" && realmActive >= 0) {
+    e.preventDefault(); e.stopPropagation(); // Pick the realm instead of saving the form
+    pickRealm(suggestItems()[realmActive].textContent);
+  } else if (e.key === "Escape") { e.preventDefault(); closeSuggest(); }
+});
+
+// mousedown runs before the input's blur, so the click isn't lost
+suggest.addEventListener("mousedown", e => {
+  const li = e.target.closest("li");
+  if (li) { e.preventDefault(); pickRealm(li.textContent); }
+});
+$("realm").addEventListener("blur", closeSuggest);
+$("region").addEventListener("change", closeSuggest);
 
 // Enter saves from any field
 $("config").addEventListener("keydown", e => { if (e.key === "Enter") $("save").click(); });
