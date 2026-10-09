@@ -77,6 +77,7 @@ If you cloned the repository with Git, run `git pull` instead of downloading the
 | `manifest.json` | Extension definition (Manifest V3). |
 | `popup.html` | Popup markup and styles. |
 | `popup.js` | Logic: sites, languages, options, Raider.io lookup and link building. |
+| `icons/` | Extension icons. `icon.svg` is the source for 32–128 px and `icon-small.svg` a simplified version for 16 px. |
 
 To add a new site, add an entry to the `SITES` list in `popup.js`.
 
