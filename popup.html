@@ -1,0 +1,208 @@
+<!doctype html>
+<meta charset="utf-8">
+<style>
+  :root {
+    --bg: #101216; --panel: #181b21; --panel-2: #20242c; --line: #2a2f39;
+    --text: #e9e6df; --muted: #8b8f99; --gold: #f2c45a; --gold-2: #b8862b;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body {
+    width: 300px; margin: 0; padding: 14px;
+    font: 13px/1.4 "Segoe UI", system-ui, sans-serif; color: var(--text);
+    background: radial-gradient(120% 60% at 50% 0%, #1d1a12 0%, var(--bg) 60%);
+  }
+
+  /* Encabezado */
+  header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .crest {
+    flex: none; width: 34px; height: 34px; border-radius: 50%;
+    display: grid; place-items: center; font-weight: 700; font-size: 15px;
+    color: #1a1408; background: linear-gradient(145deg, var(--gold), var(--gold-2));
+    box-shadow: 0 0 0 2px #2b2412, 0 2px 10px #f2c45a33;
+  }
+  .who { flex: 1; min-width: 0; }
+  .who h1 {
+    margin: 0; font-size: 15px; font-weight: 600; color: var(--gold);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .who p { margin: 0; font-size: 11.5px; color: var(--muted);
+           white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tools { display: flex; gap: 4px; flex: none; }
+  .icon {
+    width: 28px; height: 28px; display: grid; place-items: center; padding: 0; cursor: pointer;
+    color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 7px;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+  .icon:hover { color: var(--text); border-color: #3a404c; background: var(--panel); }
+  .icon.active { color: var(--gold); border-color: var(--gold-2); background: #f2c45a14; }
+  .icon svg { width: 15px; height: 15px; }
+  #settingsBtn svg { transition: transform .4s; }
+  #settingsBtn.active svg { transform: rotate(90deg); }
+
+  /* Formulario */
+  label { display: block; font-size: 11px; color: var(--muted); margin: 8px 0 3px; }
+  input, select {
+    width: 100%; padding: 7px 9px; font: inherit; color: var(--text);
+    background: var(--panel); border: 1px solid var(--line); border-radius: 7px; outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input::placeholder { color: #5d626c; }
+  input:focus, select:focus { border-color: var(--gold-2); box-shadow: 0 0 0 3px #f2c45a22; }
+  .row { display: grid; grid-template-columns: 70px 1fr; gap: 8px; }
+  .primary {
+    width: 100%; margin-top: 12px; padding: 8px; border: 0; border-radius: 7px; cursor: pointer;
+    font: inherit; font-weight: 600; color: #1a1408;
+    background: linear-gradient(180deg, var(--gold), var(--gold-2));
+  }
+  .primary:hover { filter: brightness(1.08); }
+  .secondary {
+    width: 100%; margin-top: 8px; padding: 7px; border-radius: 7px; cursor: pointer;
+    font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line);
+    transition: background .15s, border-color .15s;
+  }
+  .secondary:hover { background: var(--panel-2); border-color: #3a404c; }
+  .error { color: #ff8a80; font-size: 11.5px; margin: 6px 0 0; min-height: 1em; }
+  .empty { color: var(--muted); text-align: center; padding: 14px 0; margin: 0; }
+
+  /* Enlaces */
+  .section { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase;
+             color: var(--muted); margin: 12px 2px 6px; }
+  .section:first-child { margin-top: 0; }
+  .link {
+    display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin: 5px 0;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    color: var(--text); text-decoration: none; transition: background .15s, border-color .15s, transform .15s;
+  }
+  .link:hover { background: var(--panel-2); border-color: #3a404c; transform: translateX(2px); }
+  .tag {
+    flex: none; width: 34px; padding: 3px 0; border-radius: 5px; text-align: center;
+    font-size: 10px; font-weight: 700; color: #fff;
+  }
+  .link .name { flex: 1; }
+  .link kbd {
+    font-family: inherit; font-size: 10.5px; line-height: 1; color: var(--muted); padding: 3px 6px;
+    border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; transition: color .15s, border-color .15s;
+  }
+  .link:hover kbd { color: var(--gold); border-color: var(--gold-2); }
+  .no-kbd .link kbd { display: none; }
+
+  /* Opciones */
+  .seg { display: grid; grid-template-columns: 1fr 1fr; padding: 3px; gap: 3px;
+         background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  .seg button {
+    padding: 6px; border: 0; border-radius: 6px; cursor: pointer; font: inherit;
+    color: var(--muted); background: transparent; transition: background .15s, color .15s;
+  }
+  .seg button:hover { color: var(--text); }
+  .seg button.on { color: #1a1408; font-weight: 600; background: linear-gradient(180deg, var(--gold), var(--gold-2)); }
+  .opt {
+    display: flex; align-items: center; gap: 10px; margin: 0; padding: 7px 10px; cursor: pointer;
+    font-size: 13px; color: var(--text); border-bottom: 1px solid var(--line);
+  }
+  .opts { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .opts .opt:last-child { border-bottom: 0; }
+  .opt:hover { background: var(--panel-2); }
+  .opt .txt { flex: 1; }
+  .opt small { color: var(--muted); font-size: 11px; }
+  /* Interruptor */
+  .switch { position: relative; flex: none; width: 30px; height: 17px; }
+  .switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+  .switch span {
+    position: absolute; inset: 0; border-radius: 999px; background: #343944; transition: background .15s;
+  }
+  .switch span::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 13px; height: 13px; border-radius: 50%;
+    background: #c9ccd3; transition: transform .15s, background .15s;
+  }
+  .switch input:checked + span { background: var(--gold-2); }
+  .switch input:checked + span::after { transform: translateX(13px); background: #fff4d6; }
+  .switch input:focus-visible + span { box-shadow: 0 0 0 3px #f2c45a44; }
+
+  /* Pie */
+  footer {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line);
+    font-size: 11px; color: var(--muted);
+  }
+  .donate {
+    flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px;
+    color: var(--gold); text-decoration: none; font-weight: 600;
+    border: 1px solid #f2c45a55; background: #f2c45a12; transition: background .15s, border-color .15s;
+  }
+  .donate:hover { background: #f2c45a26; border-color: var(--gold); }
+  .donate .heart { color: #ff6b6b; }
+</style>
+
+<header>
+  <div class="crest" id="crest">W</div>
+  <div class="who">
+    <h1 id="title">WoW Links</h1>
+    <p id="subtitle"></p>
+  </div>
+  <div class="tools">
+    <button class="icon" id="copy" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+    </button>
+    <button class="icon" id="edit" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+    </button>
+    <button class="icon" id="settingsBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- Vista: configurar personaje -->
+<div id="config" hidden>
+  <div class="row">
+    <div>
+      <label for="region" data-i18n="region"></label>
+      <select id="region"><option>us</option><option>eu</option><option>kr</option><option>tw</option></select>
+    </div>
+    <div>
+      <label for="realm" data-i18n="realm"></label>
+      <input id="realm" data-i18n-ph="realmPh">
+    </div>
+  </div>
+  <label for="name" data-i18n="name"></label>
+  <input id="name" data-i18n-ph="namePh">
+  <label for="guild"><span data-i18n="guild"></span> <span style="opacity:.6" data-i18n="optional"></span></label>
+  <input id="guild" data-i18n-ph="guildPh">
+  <button class="primary" id="save" data-i18n="save"></button>
+  <p class="error" id="error"></p>
+</div>
+
+<!-- Vista: links -->
+<div id="linksView" hidden>
+  <div id="links"></div>
+  <button class="secondary" id="openAll" data-i18n="openAll"></button>
+</div>
+
+<!-- Vista: opciones -->
+<div id="settings" hidden>
+  <div class="section" data-i18n="language"></div>
+  <div class="seg" id="lang">
+    <button data-lang="es">Español</button>
+    <button data-lang="en">English</button>
+  </div>
+  <div class="section" data-i18n="charLinks"></div>
+  <div class="opts" id="charOpts"></div>
+  <div class="section" data-i18n="guildLinks"></div>
+  <div class="opts" id="guildOpts"></div>
+  <div class="section" data-i18n="prefs"></div>
+  <div class="opts">
+    <label class="opt"><span class="txt" data-i18n="background"></span>
+      <span class="switch"><input type="checkbox" id="background"><span></span></span></label>
+    <label class="opt"><span class="txt" data-i18n="shortcuts"></span>
+      <span class="switch"><input type="checkbox" id="shortcuts"><span></span></span></label>
+  </div>
+  <button class="primary" id="done" data-i18n="done"></button>
+  <button class="secondary" id="reset" data-i18n="reset"></button>
+</div>
+
+<footer>
+  <span id="hint"></span>
+  <a class="donate" id="donate" target="_blank"><span class="heart">♥</span> <span data-i18n="donate"></span></a>
+</footer>
+<script src="popup.js"></script>
