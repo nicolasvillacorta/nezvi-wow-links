@@ -18,7 +18,6 @@ A browser extension (Chrome, Edge and other Chromium browsers) for **World of Wa
   - Show or hide keyboard shortcuts.
   - Show or hide the M+ score on the toolbar icon.
 - **Keyboard shortcuts:** with the popup open, keys `1`–`9` open each link.
-- **Open all:** opens every visible link at once.
 - **Copy Name-Realm:** copies your character in the in-game format, ready for `/invite` or `/w`.
 - Settings are saved with `chrome.storage.sync`, so they follow you to any browser where you're signed in with the same account.
 

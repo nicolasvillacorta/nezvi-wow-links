@@ -9,7 +9,7 @@ const T = {
   es: {
     setup: "Configurá tu personaje", region: "Región", realm: "Reino", realmPh: "ej: Ragnaros",
     name: "Personaje", namePh: "Nombre", guild: "Guild", removeChar: "Quitar personaje",
-    save: "Guardar", error: "Completá el reino y el personaje.", openAll: "Abrir todos",
+    save: "Guardar", error: "Completá el reino y el personaje.",
     language: "Idioma", charLinks: "Links del personaje", guildLinks: "Links de la guild",
     prefs: "Preferencias", background: "Abrir links en segundo plano", shortcuts: "Mostrar atajos de teclado",
     badge: "Mostrar puntaje M+ en el ícono", score: "Puntaje Mítica+", ilvl: "Nivel de objeto equipado", raid: "Progreso en la raid actual",
@@ -24,7 +24,7 @@ const T = {
   en: {
     setup: "Set up your character", region: "Region", realm: "Realm", realmPh: "e.g. Ragnaros",
     name: "Character", namePh: "Name", guild: "Guild", removeChar: "Remove character",
-    save: "Save", error: "Enter a realm and a character.", openAll: "Open all",
+    save: "Save", error: "Enter a realm and a character.",
     language: "Language", charLinks: "Character links", guildLinks: "Guild links",
     prefs: "Preferences", background: "Open links in background", shortcuts: "Show keyboard shortcuts",
     badge: "Show M+ score on icon", score: "Mythic+ score", ilvl: "Equipped item level", raid: "Current raid progress",
@@ -212,7 +212,6 @@ function renderLinks() {
   $("links").innerHTML = html || `<p class="empty">${t().noLinks}</p>`;
   $("links").classList.toggle("no-kbd", !settings.shortcuts);
   $("links").classList.toggle("compact", settings.compact);
-  $("openAll").hidden = sites.length < 2;
   const p = currentProfile();
   $("hint").textContent = p && p.notFound ? t().notFound
     : settings.shortcuts && sites.length ? t().hint(Math.min(sites.length, 9)) : VERSION;
@@ -272,7 +271,6 @@ $("copy").onclick = async () => {
   setTimeout(() => view === "links" && renderLinks(), 1500);
 };
 
-$("openAll").onclick = () => document.querySelectorAll(".link").forEach(a => open(a.href));
 
 // Plain click: honors the "open in background" option
 $("links").addEventListener("click", e => {

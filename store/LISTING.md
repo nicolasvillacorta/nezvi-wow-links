@@ -50,7 +50,6 @@ FEATURES
 • Your M+ score on the toolbar icon, always up to date.
 • Realm autocomplete while you set up your character.
 • Keyboard shortcuts: press 1–9 to open a link.
-• Open all links at once.
 • Copy your Name-Realm in the in-game format, ready for /invite or /w.
 • Choose which links to show and open them in the background if you prefer.
 • Available in English and Spanish.
@@ -83,7 +82,6 @@ FUNCIONES
 • Tu puntaje M+ en el ícono de la barra, siempre actualizado.
 • Autocompletado de reinos al configurar tu personaje.
 • Atajos de teclado: apretá 1–9 para abrir un link.
-• Abrí todos los links de una vez.
 • Copiá tu Nombre-Reino en el formato del juego, listo para /invite o /w.
 • Elegí qué links mostrar y abrilos en segundo plano si preferís.
 • Disponible en español e inglés.
