@@ -35,4 +35,4 @@ To add a new site, add an entry to the `SITES` list in `popup.js`.
 
 ## Support the project
 
-If you find it useful, you can buy me a coffee from the ♥ button in the extension.
+If you find it useful, you can buy me a coffee on [Cafecito](https://cafecito.app/nezvi) or from the ♥ button in the extension.

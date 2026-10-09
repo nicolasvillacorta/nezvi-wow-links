@@ -3,7 +3,7 @@ const $ = id => document.getElementById(id);
 const slug = s => s.trim().toLowerCase().replace(/'/g, "").replace(/\s+/g, "-");
 
 // Replace with your donation link (Cafecito, Ko-fi, PayPal, etc.)
-const DONATE_URL = "https://cafecito.app/TU_USUARIO";
+const DONATE_URL = "https://cafecito.app/nezvi";
 const VERSION = "v" + chrome.runtime.getManifest().version;
 
 const T = {
