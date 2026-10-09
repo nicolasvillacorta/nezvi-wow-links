@@ -20,7 +20,7 @@ const T = {
     copy: "Copiar Nombre-Reino", edit: "Cambiar personaje", copied: "¡Copiado!",
     lookupPh: "Buscar en Raider.io: Nombre-Reino", lookupNeedRealm: "Agregá el reino: Nombre-Reino",
     lookupNoRealm: r => `No encontramos el reino "${r}"`, search: "Buscar jugador en Raider.io (o pegá con Ctrl+V)",
-    vault: "Cámara", vaultTip: s => `Recompensas de Míticas+ en la Cámara: ${s}`, recent: "Búsquedas recientes", clear: "Borrar",
+    recent: "Búsquedas recientes", clear: "Borrar",
     hint: n => `Tip: usá las teclas 1–${n}`, noLinks: "No hay links activos. Activalos en ⚙.",
     armory: "Armería", notFound: "No encontramos el personaje en Raider.io",
   },
@@ -38,7 +38,7 @@ const T = {
     copy: "Copy Name-Realm", edit: "Change character", copied: "Copied!",
     lookupPh: "Search Raider.io: Name-Realm", lookupNeedRealm: "Add the realm: Name-Realm",
     lookupNoRealm: r => `Realm "${r}" not found`, search: "Search a player on Raider.io (or paste with Ctrl+V)",
-    vault: "Vault", vaultTip: s => `Great Vault Mythic+ rewards: ${s}`, recent: "Recent searches", clear: "Clear",
+    recent: "Recent searches", clear: "Clear",
     hint: n => `Tip: press keys 1–${n}`, noLinks: "No links enabled. Turn them on in ⚙.",
     armory: "Armory", notFound: "Character not found on Raider.io",
   },
@@ -179,14 +179,8 @@ function renderStats(p) {
     : `<button class="stat toggle${settings.runsOpen ? " open" : ""}" id="mplusBtn" title="${t().runs}">
          <b>M+ <i>▾</i></b><span style="color:${p.scoreColor}">${p.score}</span></button>`;
   if (hasRuns) renderRuns(p);
-  const v = p.vault;
-  const slots = v ? v.slots.map(l => l ? `+${l}` : "—").join(" · ") : "";
-  const vault = !v || !p.score ? ""
-    : `<button class="stat toggle${v.done >= 8 ? " full" : ""}" title="${t().vaultTip(slots)}">
-         <b>${t().vault}</b><span>${Math.min(v.done, 8)}/8</span></button>`;
   $("stats").innerHTML = [
     mplus,
-    vault,
     p.ilvl ? chip("iLvl", p.ilvl, t().ilvl) : "",
     p.raid ? chip(raidName, raidProgress.join(" "), t().raid) : "",
   ].join("");
@@ -201,10 +195,7 @@ function renderRuns(p) {
   };
   const title = !p.title ? ""
     : `<div class="title-cut">${t().titleCut}: <b>${p.title}</b> · ${p.score >= p.title ? t().titleIn : t().titleLeft(p.title - p.score)}</div>`;
-  const v = p.vault;
-  const vault = !v ? "" : `<div class="vault-line">${t().vault} <b>${Math.min(v.done, 8)}/8</b>${
-    v.slots.map(l => l ? `<span class="slot">+${l}</span>` : `<span class="slot muted">—</span>`).join("")}</div>`;
-  $("runs").innerHTML = `${vault}<div class="runs-grid">${p.runs.map(row).join("")}</div>${title}`;
+  $("runs").innerHTML = `<div class="runs-grid">${p.runs.map(row).join("")}</div>${title}`;
 }
 
 function visibleSites() {

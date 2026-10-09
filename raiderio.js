@@ -62,19 +62,12 @@ async function titleScore(season, region) {
   return p && p.all ? Math.round(p.all.quantileMinValue) : 0;
 }
 
-// Great Vault Mythic+ row: runs this week (timed or not) and the key level behind each reward,
-// which come from your 1st, 4th and 8th highest runs of the week
-function vaultOf(weekly) {
-  const levels = (weekly || []).map(r => r.mythic_level).sort((a, b) => b - a);
-  return { done: levels.length, slots: [levels[0] || 0, levels[3] || 0, levels[7] || 0] };
-}
-
 // Character profile. Returns null on network errors so callers keep the cached one
 async function fetchProfile(c) {
   const key = charKey(c);
   const q = new URLSearchParams({
     region: c.region, realm: slug(c.realm), name: c.name.trim(),
-    fields: "guild,gear,raid_progression,mythic_plus_scores_by_season:current,mythic_plus_best_runs,mythic_plus_weekly_highest_level_runs",
+    fields: "guild,gear,raid_progression,mythic_plus_scores_by_season:current,mythic_plus_best_runs",
   });
   try {
     const res = await fetch(`${RIO}/v1/characters/profile?${q}`);
@@ -97,7 +90,6 @@ async function fetchProfile(c) {
       scoreColor: season && season.segments ? season.segments.all.color : "",
       ilvl: d.gear ? Math.floor(d.gear.item_level_equipped) : 0,
       raid, runs, title,
-      vault: vaultOf(d.mythic_plus_weekly_highest_level_runs),
     };
   } catch { return null; }
 }
