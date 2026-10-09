@@ -9,26 +9,33 @@ const VERSION = "v" + chrome.runtime.getManifest().version;
 const T = {
   es: {
     setup: "Configurá tu personaje", region: "Región", realm: "Reino", realmPh: "ej: Ragnaros",
-    name: "Personaje", namePh: "Nombre", guild: "Guild", optional: "(opcional)", guildPh: "Nombre de la guild",
+    name: "Personaje", namePh: "Nombre", guild: "Guild", optional: "(opcional)", guildPh: "Se detecta sola si la dejás vacía",
     save: "Guardar", error: "Completá el reino y el personaje.", openAll: "Abrir todos",
     language: "Idioma", charLinks: "Links del personaje", guildLinks: "Links de la guild",
     prefs: "Preferencias", background: "Abrir links en segundo plano", shortcuts: "Mostrar atajos de teclado",
     done: "Listo", reset: "Restablecer opciones", donate: "Invitame un café", settings: "Opciones",
     copy: "Copiar Nombre-Reino", edit: "Cambiar personaje", copied: "¡Copiado!",
     hint: n => `Tip: usá las teclas 1–${n}`, noLinks: "No hay links activos. Activalos en ⚙.",
-    armory: "Armería",
+    armory: "Armería", notFound: "No encontramos el personaje en Raider.io",
   },
   en: {
     setup: "Set up your character", region: "Region", realm: "Realm", realmPh: "e.g. Ragnaros",
-    name: "Character", namePh: "Name", guild: "Guild", optional: "(optional)", guildPh: "Guild name",
+    name: "Character", namePh: "Name", guild: "Guild", optional: "(optional)", guildPh: "Auto-detected if left empty",
     save: "Save", error: "Enter a realm and a character.", openAll: "Open all",
     language: "Language", charLinks: "Character links", guildLinks: "Guild links",
     prefs: "Preferences", background: "Open links in background", shortcuts: "Show keyboard shortcuts",
     done: "Done", reset: "Reset options", donate: "Buy me a coffee", settings: "Options",
     copy: "Copy Name-Realm", edit: "Change character", copied: "Copied!",
     hint: n => `Tip: press keys 1–${n}`, noLinks: "No links enabled. Turn them on in ⚙.",
-    armory: "Armory",
+    armory: "Armory", notFound: "Character not found on Raider.io",
   },
+};
+
+// Official class colors, keyed by the class name Raider.io returns
+const CLASS_COLORS = {
+  "Death Knight": "#C41E3A", "Demon Hunter": "#A330C9", "Druid": "#FF7C0A", "Evoker": "#33937F",
+  "Hunter": "#AAD372", "Mage": "#3FC7EB", "Monk": "#00FF98", "Paladin": "#F48CBA", "Priest": "#FFFFFF",
+  "Rogue": "#FFF468", "Shaman": "#0070DD", "Warlock": "#8788EE", "Warrior": "#C69B6D",
 };
 
 // Armory locale based on language and region
@@ -49,13 +56,13 @@ const SITES = [
   { id: "dfa", scope: "char", tag: "DFA", color: "#2a9d8f", name: "Data for Azeroth", on: false,
     url: c => `https://www.dataforazeroth.com/characters/${c.r}/${c.realm}/${c.n}` },
   { id: "g-rio", scope: "guild", tag: "RIO", color: "#e8762b", name: "Raider.io", on: true,
-    url: c => `https://raider.io/guilds/${c.r}/${c.realm}/${c.g}` },
+    url: c => `https://raider.io/guilds/${c.r}/${c.gRealm}/${c.g}` },
   { id: "g-wcl", scope: "guild", tag: "WCL", color: "#a3742c", name: "Warcraft Logs", on: true,
-    url: c => `https://www.warcraftlogs.com/guild/${c.r}/${c.realm}/${c.g}` },
+    url: c => `https://www.warcraftlogs.com/guild/${c.r}/${c.gRealm}/${c.g}` },
   { id: "g-wp", scope: "guild", tag: "WP", color: "#4b8f3a", name: "WoWProgress", on: false,
-    url: c => `https://www.wowprogress.com/guild/${c.r}/${c.realm}/${c.g}` },
+    url: c => `https://www.wowprogress.com/guild/${c.r}/${c.gRealm}/${c.g}` },
   { id: "g-armory", scope: "guild", tag: "ARM", color: "#1f6fd1", name: t => t.armory, on: false,
-    url: c => `https://worldofwarcraft.blizzard.com/${armoryLocale(c.lang, c.r)}/guild/${c.r}/${c.realm}/${slug(c.guild)}` },
+    url: c => `https://worldofwarcraft.blizzard.com/${armoryLocale(c.lang, c.r)}/guild/${c.r}/${c.gRealm}/${slug(c.guild)}` },
 ];
 
 const defaults = () => ({
@@ -67,6 +74,7 @@ const defaults = () => ({
 
 let settings = defaults();
 let char = null;
+let profile = null; // Raider.io data for char: { key, guild, guildRealm, cls, thumb, notFound }
 let view = "config"; // config | links | settings
 let prevView = "config";
 const t = () => T[settings.lang];
@@ -95,24 +103,65 @@ function show(v) {
   if (v === "config") { $("hint").textContent = VERSION; $("realm").focus(); }
 }
 
+// ---------- Raider.io profile ----------
+const charKey = c => [c.region, slug(c.realm), c.name.trim().toLowerCase()].join("/");
+const currentProfile = () => profile && char && profile.key === charKey(char) ? profile : null;
+
+// The manual guild wins; otherwise use the one Raider.io reports
+function guildOf() {
+  const manual = char.guild.trim(), p = currentProfile();
+  if (manual) return { name: manual, realm: char.realm };
+  if (p && p.guild) return { name: p.guild, realm: p.guildRealm };
+  return null;
+}
+
+async function fetchProfile(c) {
+  const q = new URLSearchParams({ region: c.region, realm: slug(c.realm), name: c.name.trim(), fields: "guild" });
+  const key = charKey(c);
+  try {
+    const res = await fetch(`https://raider.io/api/v1/characters/profile?${q}`);
+    if (!res.ok) return { key, notFound: res.status === 400 || res.status === 404 };
+    const d = await res.json();
+    return { key, guild: d.guild ? d.guild.name : "", guildRealm: d.guild ? d.guild.realm : "",
+             cls: d.class, thumb: d.thumbnail_url };
+  } catch { return null; } // Offline or network error: keep the cached profile
+}
+
+async function refreshProfile() {
+  if (!char) return;
+  const p = await fetchProfile(char);
+  if (!p || !char || p.key !== charKey(char)) return;
+  profile = p;
+  chrome.storage.local.set({ profile });
+  if (view !== "config") show(view);
+}
+
+// ---------- Header ----------
 function renderHeader() {
+  const crest = $("crest");
+  crest.classList.remove("avatar"); crest.style.backgroundImage = crest.style.boxShadow = "";
+  $("title").style.color = "";
   if (!char) {
-    $("crest").textContent = "N"; $("title").textContent = "Nezvi WoW"; $("subtitle").textContent = t().setup;
+    crest.textContent = "N"; $("title").textContent = "Nezvi WoW"; $("subtitle").textContent = t().setup;
     return;
   }
-  const name = char.name.trim(), guild = char.guild.trim();
-  $("crest").textContent = name[0].toUpperCase();
+  const name = char.name.trim(), guild = guildOf(), p = currentProfile();
+  crest.textContent = name[0].toUpperCase();
   $("title").textContent = name;
-  $("subtitle").textContent = `${char.realm.trim()} · ${char.region.toUpperCase()}` + (guild ? ` · <${guild}>` : "");
+  $("subtitle").textContent = `${char.realm.trim()} · ${char.region.toUpperCase()}` + (guild ? ` · <${guild.name}>` : "");
+  if (p && p.thumb) { crest.classList.add("avatar"); crest.style.backgroundImage = `url("${p.thumb}")`; }
+  const color = p && CLASS_COLORS[p.cls];
+  if (color) { $("title").style.color = color; crest.style.boxShadow = `0 0 0 2px ${color}, 0 2px 10px ${color}44`; }
 }
 
 function visibleSites() {
-  return SITES.filter(s => settings.links[s.id] && (s.scope === "char" || char.guild.trim()));
+  return SITES.filter(s => settings.links[s.id] && (s.scope === "char" || guildOf()));
 }
 
 function renderLinks() {
+  const guild_ = guildOf() || { name: "", realm: "" };
   const c = { r: char.region, realm: slug(char.realm), n: encodeURIComponent(char.name.trim()),
-              g: encodeURIComponent(char.guild.trim()), guild: char.guild, lang: settings.lang };
+              g: encodeURIComponent(guild_.name), guild: guild_.name, gRealm: slug(guild_.realm), lang: settings.lang };
   const sites = visibleSites();
   const item = (s, i) =>
     `<a class="link" href="${s.url(c)}" target="_blank">
@@ -127,8 +176,9 @@ function renderLinks() {
   $("links").innerHTML = html || `<p class="empty">${t().noLinks}</p>`;
   $("links").classList.toggle("no-kbd", !settings.shortcuts);
   $("openAll").hidden = sites.length < 2;
-  $("hint").textContent = settings.shortcuts && sites.length
-    ? t().hint(Math.min(sites.length, 9)) : VERSION;
+  const p = currentProfile();
+  $("hint").textContent = p && p.notFound ? t().notFound
+    : settings.shortcuts && sites.length ? t().hint(Math.min(sites.length, 9)) : VERSION;
 }
 
 function renderSettings() {
@@ -190,7 +240,7 @@ $("save").onclick = () => {
               name: $("name").value, guild: $("guild").value };
   if (!c.realm.trim() || !c.name.trim()) { $("error").textContent = t().error; return; }
   $("error").textContent = "";
-  chrome.storage.sync.set({ char: c }, () => { char = c; show("links"); });
+  chrome.storage.sync.set({ char: c }, () => { char = c; show("links"); refreshProfile(); });
 };
 
 // Enter saves from any field
@@ -205,12 +255,15 @@ document.addEventListener("keydown", e => {
 
 // ---------- Startup ----------
 $("donate").href = DONATE_URL;
-chrome.storage.sync.get(["char", "settings"], data => {
+chrome.storage.sync.get(["char", "settings"], async data => {
   const d = defaults();
   // Merge with defaults so newly added sites show up with their default value
   settings = { ...d, ...data.settings, links: { ...d.links, ...(data.settings && data.settings.links) } };
   char = data.char || null;
+  // Show the cached profile right away, then refresh it from Raider.io
+  ({ profile = null } = await chrome.storage.local.get("profile"));
   if (char) Object.keys(char).forEach(k => $(k).value = char[k]);
   applyLang();
   show(char ? "links" : "config");
+  refreshProfile();
 });

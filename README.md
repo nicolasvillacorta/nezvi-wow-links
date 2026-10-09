@@ -5,7 +5,9 @@ A Chrome extension for **World of Warcraft** players: save your character once a
 ## Features
 
 - **Character links:** Raider.io, Warcraft Logs, Armory and WoWProgress are enabled on install. Simple Armory and Data for Azeroth can be turned on in the options.
-- **Guild links:** if you add a guild, its Raider.io and Warcraft Logs pages show up too (WoWProgress and the Armory are optional).
+- **Automatic guild detection:** the guild is looked up on Raider.io from your character, so you don't need to type it (you can still set one manually). Guild links use the guild's own realm, which works with connected realms.
+- **Guild links:** Raider.io and Warcraft Logs are enabled by default (WoWProgress and the Armory are optional).
+- **Character card:** shows your in-game avatar and class color, fetched from Raider.io.
 - **Options (⚙):**
   - Language: English or Spanish (the Armory opens in the same language).
   - Choose which links to show or hide.
@@ -29,7 +31,7 @@ A Chrome extension for **World of Warcraft** players: save your character once a
 | --- | --- |
 | `manifest.json` | Extension definition (Manifest V3). |
 | `popup.html` | Popup markup and styles. |
-| `popup.js` | Logic: sites, languages, options and link building. |
+| `popup.js` | Logic: sites, languages, options, Raider.io lookup and link building. |
 
 To add a new site, add an entry to the `SITES` list in `popup.js`.
 
