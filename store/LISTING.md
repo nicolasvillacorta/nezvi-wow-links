@@ -2,7 +2,7 @@
 
 Copy-paste material for the Microsoft Edge Add-ons and Chrome Web Store submissions.
 
-- **Package:** build `dist/nezvi-wow-extension-<version>.zip` (only `manifest.json`, `popup.html`, `popup.js` and `icons/*.png`, with `manifest.json` at the root).
+- **Package:** build `dist/nezvi-wow-extension-<version>.zip` (only `manifest.json`, `popup.html`, `popup.js`, `raiderio.js`, `background.js` and `icons/*.png`, with `manifest.json` at the root).
 - **Privacy policy URL:** https://github.com/nicolasvillacorta/nezvi-wow-links/blob/main/PRIVACY.md
 - **Website:** https://github.com/nicolasvillacorta/nezvi-wow-links
 - **Support:** https://github.com/nicolasvillacorta/nezvi-wow-links/issues
@@ -46,6 +46,9 @@ FEATURES
 • Automatic guild detection: your guild is looked up on Raider.io, including guilds on connected realms.
 • Guild links to Raider.io and Warcraft Logs (WoWProgress and the Armory are optional).
 • Your in-game avatar and class color in the popup.
+• Your Mythic+ score, item level and current raid progress at a glance.
+• Your M+ score on the toolbar icon, always up to date.
+• Realm autocomplete while you set up your character.
 • Keyboard shortcuts: press 1–9 to open a link.
 • Open all links at once.
 • Copy your Name-Realm in the in-game format, ready for /invite or /w.
@@ -76,6 +79,9 @@ FUNCIONES
 • Detección automática de la guild desde Raider.io, incluso en reinos conectados.
 • Links de la guild a Raider.io y Warcraft Logs (WoWProgress y la Armería son opcionales).
 • El avatar y el color de clase de tu personaje en el popup.
+• Tu puntaje de Mítica+, nivel de objeto y progreso en la raid actual de un vistazo.
+• Tu puntaje M+ en el ícono de la barra, siempre actualizado.
+• Autocompletado de reinos al configurar tu personaje.
 • Atajos de teclado: apretá 1–9 para abrir un link.
 • Abrí todos los links de una vez.
 • Copiá tu Nombre-Reino en el formato del juego, listo para /invite o /w.
@@ -115,10 +121,16 @@ Gives World of Warcraft players quick links to their character's and guild's pub
 Saves the character the user enters (region, realm, name and optional guild) and the user's preferences (language, visible links), so they don't need to be entered every time the popup opens.
 ```
 
+**Permission justification — alarms**
+
+```text
+Schedules a refresh every 2 hours so the character's Mythic+ score shown on the toolbar icon badge stays up to date without the user opening the popup.
+```
+
 **Permission justification — host permission (https://raider.io/*)**
 
 ```text
-Used only to call the public Raider.io API (raider.io/api/v1/characters/profile) with the character's region, realm and name, to detect the character's guild, guild realm, class and avatar. No other site is accessed and no page content is read or modified.
+Used only to call the Raider.io API: the character profile (region, realm and name) to show the guild, class, avatar, Mythic+ score, item level and raid progress; the raid static data to know which raid is current; and the realm search to suggest realm names while typing. No other site is accessed and no page content is read or modified.
 ```
 
 **Remote code:** No. All code is included in the package; the extension only fetches JSON data from the Raider.io API.

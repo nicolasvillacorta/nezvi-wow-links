@@ -1,6 +1,6 @@
 # Privacy Policy — Nezvi WoW Extension
 
-*Last updated: October 9, 2026*
+*Last updated: October 9, 2026 (version 1.2)*
 
 Nezvi WoW Extension ("the extension") is a browser extension that gives World of Warcraft players quick links to their character's public profiles. This policy explains what data the extension handles.
 
@@ -22,14 +22,17 @@ This data is saved with the browser's built-in extension storage (`chrome.storag
 
 ## Data sent to third parties
 
-To detect your character's guild, class and avatar, the extension sends your **region, realm and character name** to the public [Raider.io](https://raider.io) API. No other data is sent, and no identifier for you or your browser is included. Raider.io's handling of requests is covered by its own privacy policy.
+To show your character's guild, class, avatar, Mythic+ score, item level and raid progress, the extension sends your **region, realm and character name** to the public [Raider.io](https://raider.io) API. This happens when you open the popup and in the background about every 2 hours, to keep the score on the toolbar icon up to date. No other data is sent, and no identifier for you or your browser is included.
+
+While you type a realm name, the text you've typed so far is sent to Raider.io's search to suggest matching realms. Raider.io's handling of requests is covered by its own privacy policy.
 
 When you click a link, the browser opens that website (Raider.io, Warcraft Logs, the World of Warcraft Armory, WoWProgress, Simple Armory or Data for Azeroth). Those sites are independent and have their own privacy policies.
 
 ## Permissions
 
 - **storage:** saves your character and preferences.
-- **Access to raider.io:** looks up your character's guild, class and avatar.
+- **alarms:** schedules the periodic refresh of the M+ score shown on the toolbar icon.
+- **Access to raider.io:** looks up your character's guild, class, avatar, score, item level and raid progress, and suggests realm names.
 
 ## Removing your data
 

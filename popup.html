@@ -28,6 +28,14 @@
     margin: 0; font-size: 15px; font-weight: 600; color: var(--gold);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
+  #guildLine { color: #b7a77a; }
+  .stats { display: flex; gap: 6px; margin: -4px 0 12px; }
+  .stat {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 5px 4px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px; white-space: nowrap;
+  }
+  .stat b { font-size: 9.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .stat span { font-size: 13px; font-weight: 600; }
   .who p { margin: 0; font-size: 11.5px; color: var(--muted);
            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tools { display: flex; gap: 4px; flex: none; }
@@ -141,6 +149,7 @@
   <div class="who">
     <h1 id="title">Nezvi WoW</h1>
     <p id="subtitle"></p>
+    <p id="guildLine" hidden></p>
   </div>
   <div class="tools">
     <button class="icon" id="copy" hidden>
@@ -154,6 +163,7 @@
     </button>
   </div>
 </header>
+<div class="stats" id="stats" hidden></div>
 
 <!-- View: character setup -->
 <div id="config" hidden>
@@ -164,7 +174,8 @@
     </div>
     <div>
       <label for="realm" data-i18n="realm"></label>
-      <input id="realm" data-i18n-ph="realmPh">
+      <input id="realm" data-i18n-ph="realmPh" list="realmList" autocomplete="off">
+      <datalist id="realmList"></datalist>
     </div>
   </div>
   <label for="name" data-i18n="name"></label>
@@ -198,6 +209,8 @@
       <span class="switch"><input type="checkbox" id="background"><span></span></span></label>
     <label class="opt"><span class="txt" data-i18n="shortcuts"></span>
       <span class="switch"><input type="checkbox" id="shortcuts"><span></span></span></label>
+    <label class="opt"><span class="txt" data-i18n="badge"></span>
+      <span class="switch"><input type="checkbox" id="badge"><span></span></span></label>
   </div>
   <button class="primary" id="done" data-i18n="done"></button>
   <button class="secondary" id="reset" data-i18n="reset"></button>
@@ -207,4 +220,5 @@
   <span id="hint"></span>
   <a class="donate" id="donate" target="_blank"><span class="heart">♥</span> <span data-i18n="donate"></span></a>
 </footer>
+<script src="raiderio.js"></script>
 <script src="popup.js"></script>
