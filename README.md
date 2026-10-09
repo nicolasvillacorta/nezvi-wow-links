@@ -1,6 +1,6 @@
 # Nezvi WoW Extension
 
-A Chrome extension for **World of Warcraft** players: save your character once and get one-click access to its profiles on Raider.io, Warcraft Logs, the Armory, WoWProgress and more. Available in English and Spanish.
+A browser extension (Chrome, Edge and other Chromium browsers) for **World of Warcraft** players: save your character once and get one-click access to its profiles on Raider.io, Warcraft Logs, the Armory, WoWProgress and more. Available in English and Spanish.
 
 ## Features
 
@@ -16,14 +16,59 @@ A Chrome extension for **World of Warcraft** players: save your character once a
 - **Keyboard shortcuts:** with the popup open, keys `1`–`9` open each link.
 - **Open all:** opens every visible link at once.
 - **Copy Name-Realm:** copies your character in the in-game format, ready for `/invite` or `/w`.
-- Settings are saved with `chrome.storage.sync`, so they follow you to any Chrome where you're signed in.
+- Settings are saved with `chrome.storage.sync`, so they follow you to any browser where you're signed in with the same account.
 
-## Installation (developer mode)
+## Installation
 
-1. Download or clone this repository.
-2. Open `chrome://extensions` and turn on **Developer mode**.
-3. Click **Load unpacked** and select the project folder.
-4. Pin the extension to the toolbar and set up your character.
+The extension isn't on the Chrome Web Store or Edge Add-ons yet, so for now it's installed manually. It takes about a minute.
+
+### 1. Download it
+
+1. [Download the ZIP](https://github.com/nicolasvillacorta/nezvi-wow-links/archive/refs/heads/main.zip) (or click **Code → Download ZIP** at the top of this page).
+2. Extract it somewhere permanent, for example `Documents
+ezvi-wow-extension`.
+
+> **Don't delete or move that folder afterwards.** The browser loads the extension from it, so if the folder disappears, the extension stops working.
+
+### 2. Load it in your browser
+
+**Google Chrome**
+
+1. Go to `chrome://extensions`.
+2. Turn on **Developer mode** (top-right corner).
+3. Click **Load unpacked** and select the extracted folder (the one that contains `manifest.json`).
+
+**Microsoft Edge**
+
+1. Go to `edge://extensions`.
+2. Turn on **Developer mode** (left sidebar).
+3. Click **Load unpacked** and select the extracted folder (the one that contains `manifest.json`).
+
+Other Chromium browsers (Brave, Opera, Vivaldi) work the same way from their extensions page.
+
+### 3. Pin it to the toolbar
+
+Click the puzzle-piece icon in the toolbar and pin **Nezvi WoW Extension** so it's always one click away.
+
+The browser may show a warning about developer-mode extensions. That's expected for extensions installed outside the store.
+
+## How to use it
+
+1. Click the extension icon.
+2. Pick your **region**, type your **realm** and **character name**, and click **Save**. Leave **Guild** empty to detect it automatically.
+3. Click any link, or press its number key (`1`, `2`, `3`…) to open it.
+4. Use the icons at the top to **copy Name-Realm** (copy icon), **change character** (pencil) or open the **options** (⚙).
+
+## Updating
+
+Until the extension is published, updates are manual:
+
+1. Download the ZIP again and replace the contents of your existing folder with the new files.
+2. Go to `chrome://extensions` (or `edge://extensions`) and click the **reload** icon on the extension's card.
+
+Your character and options are kept.
+
+If you cloned the repository with Git, run `git pull` instead of downloading the ZIP, then reload.
 
 ## Project structure
 
