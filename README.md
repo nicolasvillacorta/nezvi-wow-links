@@ -1,4 +1,4 @@
-# WoW Links
+# Nezvi WoW Extension
 
 Extensión de Chrome para jugadores de **World of Warcraft**: guardás tu personaje una sola vez y tenés a un click sus perfiles en Raider.io, Warcraft Logs, la Armería, WoWProgress y más.
 

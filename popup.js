@@ -97,7 +97,7 @@ function show(v) {
 
 function renderHeader() {
   if (!char) {
-    $("crest").textContent = "W"; $("title").textContent = "WoW Links"; $("subtitle").textContent = t().setup;
+    $("crest").textContent = "N"; $("title").textContent = "Nezvi WoW"; $("subtitle").textContent = t().setup;
     return;
   }
   const name = char.name.trim(), guild = char.guild.trim();

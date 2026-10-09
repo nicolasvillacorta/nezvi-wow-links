@@ -1,6 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "WoW Links",
+  "name": "Nezvi WoW Extension",
+  "short_name": "Nezvi WoW",
   "version": "1.1",
   "description": "Raider.io, Warcraft Logs y más de tu personaje, a un click.",
   "action": { "default_popup": "popup.html" },
