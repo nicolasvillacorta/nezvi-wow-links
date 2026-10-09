@@ -19,7 +19,7 @@ const T = {
     done: "Listo", reset: "Restablecer opciones", donate: "Invitame un café", settings: "Opciones",
     copy: "Copiar Nombre-Reino", edit: "Cambiar personaje", copied: "¡Copiado!",
     lookupPh: "Buscar en Raider.io: Nombre-Reino", lookupNeedRealm: "Agregá el reino: Nombre-Reino",
-    lookupNoRealm: r => `No encontramos el reino "${r}"`,
+    lookupNoRealm: r => `No encontramos el reino "${r}"`, search: "Buscar jugador en Raider.io (o pegá con Ctrl+V)",
     hint: n => `Tip: usá las teclas 1–${n}`, noLinks: "No hay links activos. Activalos en ⚙.",
     armory: "Armería", notFound: "No encontramos el personaje en Raider.io",
   },
@@ -36,7 +36,7 @@ const T = {
     done: "Done", reset: "Reset options", donate: "Buy me a coffee", settings: "Options",
     copy: "Copy Name-Realm", edit: "Change character", copied: "Copied!",
     lookupPh: "Search Raider.io: Name-Realm", lookupNeedRealm: "Add the realm: Name-Realm",
-    lookupNoRealm: r => `Realm "${r}" not found`,
+    lookupNoRealm: r => `Realm "${r}" not found`, search: "Search a player on Raider.io (or paste with Ctrl+V)",
     hint: n => `Tip: press keys 1–${n}`, noLinks: "No links enabled. Turn them on in ⚙.",
     armory: "Armory", notFound: "Character not found on Raider.io",
   },
@@ -100,7 +100,7 @@ function applyLang() {
   document.documentElement.lang = settings.lang;
   document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t()[el.dataset.i18n]);
   document.querySelectorAll("[data-i18n-ph]").forEach(el => el.placeholder = t()[el.dataset.i18nPh]);
-  $("copy").title = t().copy; $("edit").title = t().edit; $("settingsBtn").title = t().settings;
+  $("searchBtn").title = t().search; $("copy").title = t().copy; $("edit").title = t().edit; $("settingsBtn").title = t().settings;
   document.querySelectorAll("#lang button").forEach(b => b.classList.toggle("on", b.dataset.lang === settings.lang));
 }
 
@@ -116,8 +116,9 @@ function show(v) {
   if (v === "links") renderLinks();
   if (v === "settings") renderSettings();
   if (v === "config") { $("hint").textContent = VERSION; $("removeChar").hidden = !char; $("realm").focus(); }
-  $("lookup").hidden = v === "settings";
-  if (v === "links") $("lookupInput").focus();
+  // The lookup box stays folded behind the magnifier button
+  $("searchBtn").hidden = v === "settings";
+  if (v === "settings") toggleLookup(false);
   $("stats").hidden = v !== "links" || !$("stats").childElementCount;
   $("runs").hidden = v !== "links" || !settings.runsOpen || !$("runs").childElementCount;
 }
@@ -371,6 +372,13 @@ function parsePlayer(text) {
   return { error: t().lookupNoRealm(realmText) };
 }
 
+function toggleLookup(open = $("lookup").hidden) {
+  $("lookup").hidden = !open;
+  $("searchBtn").classList.toggle("active", open);
+  $("lookupError").hidden = true;
+  if (open) $("lookupInput").focus(); else $("lookupInput").value = "";
+}
+
 function lookup() {
   const p = parsePlayer($("lookupInput").value);
   if (!p) return;
@@ -379,15 +387,27 @@ function lookup() {
   chrome.tabs.create({ url: `https://raider.io/characters/${p.region}/${encodeURIComponent(slug(p.realm))}/${encodeURIComponent(p.name)}` });
 }
 
-$("lookupInput").addEventListener("keydown", e => { if (e.key === "Enter") lookup(); });
+$("searchBtn").onclick = () => toggleLookup();
+$("lookupInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") lookup();
+  if (e.key === "Escape" && !$("lookupInput").value) { e.preventDefault(); toggleLookup(false); }
+});
 // Pasting opens Raider.io right away, no Enter needed
 $("lookupInput").addEventListener("paste", () => setTimeout(lookup));
 $("lookupInput").addEventListener("input", () => { $("lookupError").hidden = true; });
+// Ctrl+V anywhere in the popup (outside other fields) looks up the pasted name, even with the box folded
+document.addEventListener("paste", e => {
+  if (view === "settings" || e.target.tagName === "INPUT") return;
+  e.preventDefault();
+  toggleLookup(true);
+  $("lookupInput").value = e.clipboardData.getData("text");
+  lookup();
+});
 
 // Shortcuts: keys 1–9 open the matching link
 document.addEventListener("keydown", e => {
   if (view !== "links" || !settings.shortcuts) return;
-  // The lookup box is focused on open: digits are shortcuts until something is typed in it
+  // Digits are shortcuts unless you're typing in a field (an empty lookup box still counts as not typing)
   if (e.target.tagName === "INPUT" && (e.target.id !== "lookupInput" || e.target.value)) return;
   const a = document.querySelectorAll(".link")[Number(e.key) - 1];
   if (a) { e.preventDefault(); open(a.href); }
