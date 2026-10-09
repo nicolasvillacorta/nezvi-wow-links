@@ -18,6 +18,8 @@ const T = {
     depleted: "Fuera de tiempo", notDone: "Sin completar",
     done: "Listo", reset: "Restablecer opciones", donate: "Invitame un café", settings: "Opciones",
     copy: "Copiar Nombre-Reino", edit: "Cambiar personaje", copied: "¡Copiado!",
+    lookupPh: "Pegá Nombre-Reino", lookupNeedRealm: "Agregá el reino: Nombre-Reino",
+    lookupNoRealm: r => `No encontramos el reino "${r}"`,
     hint: n => `Tip: usá las teclas 1–${n}`, noLinks: "No hay links activos. Activalos en ⚙.",
     armory: "Armería", notFound: "No encontramos el personaje en Raider.io",
   },
@@ -33,6 +35,8 @@ const T = {
     depleted: "Over time", notDone: "Not completed",
     done: "Done", reset: "Reset options", donate: "Buy me a coffee", settings: "Options",
     copy: "Copy Name-Realm", edit: "Change character", copied: "Copied!",
+    lookupPh: "Paste Name-Realm", lookupNeedRealm: "Add the realm: Name-Realm",
+    lookupNoRealm: r => `Realm "${r}" not found`,
     hint: n => `Tip: press keys 1–${n}`, noLinks: "No links enabled. Turn them on in ⚙.",
     armory: "Armory", notFound: "Character not found on Raider.io",
   },
@@ -112,6 +116,8 @@ function show(v) {
   if (v === "links") renderLinks();
   if (v === "settings") renderSettings();
   if (v === "config") { $("hint").textContent = VERSION; $("removeChar").hidden = !char; $("realm").focus(); }
+  $("lookup").hidden = v === "settings";
+  if (v === "links") $("lookupInput").focus();
   $("stats").hidden = v !== "links" || !$("stats").childElementCount;
   $("runs").hidden = v !== "links" || !settings.runsOpen || !$("runs").childElementCount;
 }
@@ -347,11 +353,44 @@ $("region").addEventListener("change", closeSuggest);
 // Enter saves from any field
 $("config").addEventListener("keydown", e => { if (e.key === "Enter") $("save").click(); });
 
+// ---------- Player lookup ----------
+// "Name-Realm" as copied in game ("Nezvi-MoonGuard"), or just "Name" for someone on your own realm
+function parsePlayer(text) {
+  const raw = text.trim().replace(/\s+/g, " ");
+  const dash = raw.indexOf("-");
+  const name = (dash < 0 ? raw : raw.slice(0, dash)).trim();
+  const realmText = dash < 0 ? "" : raw.slice(dash + 1).trim();
+  if (!name) return null;
+  if (!realmText) return char ? { name, region: char.region, realm: char.realm } : { error: t().lookupNeedRealm };
+  // Your own region first, so realms that exist in several regions resolve to yours
+  const home = char ? char.region : "us";
+  for (const region of [home, ...Object.keys(REALMS).filter(r => r !== home)]) {
+    const realm = REALMS[region].find(r => realmKey(r) === realmKey(realmText));
+    if (realm) return { name, region, realm };
+  }
+  return { error: t().lookupNoRealm(realmText) };
+}
+
+function lookup() {
+  const p = parsePlayer($("lookupInput").value);
+  if (!p) return;
+  if (p.error) { $("lookupError").textContent = p.error; $("lookupError").hidden = false; return; }
+  $("lookupInput").value = "";
+  chrome.tabs.create({ url: `https://raider.io/characters/${p.region}/${encodeURIComponent(slug(p.realm))}/${encodeURIComponent(p.name)}` });
+}
+
+$("lookupInput").addEventListener("keydown", e => { if (e.key === "Enter") lookup(); });
+// Pasting opens Raider.io right away, no Enter needed
+$("lookupInput").addEventListener("paste", () => setTimeout(lookup));
+$("lookupInput").addEventListener("input", () => { $("lookupError").hidden = true; });
+
 // Shortcuts: keys 1–9 open the matching link
 document.addEventListener("keydown", e => {
   if (view !== "links" || !settings.shortcuts) return;
+  // The lookup box is focused on open: digits are shortcuts until something is typed in it
+  if (e.target.tagName === "INPUT" && (e.target.id !== "lookupInput" || e.target.value)) return;
   const a = document.querySelectorAll(".link")[Number(e.key) - 1];
-  if (a) open(a.href);
+  if (a) { e.preventDefault(); open(a.href); }
 });
 
 // ---------- Startup ----------
