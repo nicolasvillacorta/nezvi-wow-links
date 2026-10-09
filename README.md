@@ -81,6 +81,12 @@ If you cloned the repository with Git, run `git pull` instead of downloading the
 
 To add a new site, add an entry to the `SITES` list in `popup.js`.
 
+Store listing texts and images live in [`store/`](store/LISTING.md).
+
+## Privacy
+
+The extension has no accounts, tracking or ads. See the [privacy policy](PRIVACY.md).
+
 ## Support the project
 
 If you find it useful, you can buy me a coffee on [Cafecito](https://cafecito.app/nezvi) or from the ♥ button in the extension.
