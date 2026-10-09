@@ -1,5 +1,5 @@
 const $ = id => document.getElementById(id);
-// slug, charKey, fetchProfile and searchRealms come from raiderio.js
+// slug, blizzSlug, charKey and fetchProfile come from raiderio.js; REALMS, realmKey and matchRealms from realms.js
 
 // Replace with your donation link (Cafecito, Ko-fi, PayPal, etc.)
 const DONATE_URL = "https://cafecito.app/nezvi";
@@ -8,11 +8,14 @@ const VERSION = "v" + chrome.runtime.getManifest().version;
 const T = {
   es: {
     setup: "Configurá tu personaje", region: "Región", realm: "Reino", realmPh: "ej: Ragnaros",
-    name: "Personaje", namePh: "Nombre", guild: "Guild", optional: "(opcional)", guildPh: "Se detecta sola si la dejás vacía",
+    name: "Personaje", namePh: "Nombre", guild: "Guild", removeChar: "Quitar personaje",
     save: "Guardar", error: "Completá el reino y el personaje.", openAll: "Abrir todos",
     language: "Idioma", charLinks: "Links del personaje", guildLinks: "Links de la guild",
     prefs: "Preferencias", background: "Abrir links en segundo plano", shortcuts: "Mostrar atajos de teclado",
     badge: "Mostrar puntaje M+ en el ícono", score: "Puntaje Mítica+", ilvl: "Nivel de objeto equipado", raid: "Progreso en la raid actual",
+    compact: "Modo compacto", faction: "Colores de facción", runs: "Ver mejores llaves",
+    titleCut: "Título (top 0,1%)", titleLeft: n => `te faltan ${n}`, titleIn: "¡en rango!",
+    depleted: "Fuera de tiempo", notDone: "Sin completar",
     done: "Listo", reset: "Restablecer opciones", donate: "Invitame un café", settings: "Opciones",
     copy: "Copiar Nombre-Reino", edit: "Cambiar personaje", copied: "¡Copiado!",
     hint: n => `Tip: usá las teclas 1–${n}`, noLinks: "No hay links activos. Activalos en ⚙.",
@@ -20,11 +23,14 @@ const T = {
   },
   en: {
     setup: "Set up your character", region: "Region", realm: "Realm", realmPh: "e.g. Ragnaros",
-    name: "Character", namePh: "Name", guild: "Guild", optional: "(optional)", guildPh: "Auto-detected if left empty",
+    name: "Character", namePh: "Name", guild: "Guild", removeChar: "Remove character",
     save: "Save", error: "Enter a realm and a character.", openAll: "Open all",
     language: "Language", charLinks: "Character links", guildLinks: "Guild links",
     prefs: "Preferences", background: "Open links in background", shortcuts: "Show keyboard shortcuts",
     badge: "Show M+ score on icon", score: "Mythic+ score", ilvl: "Equipped item level", raid: "Current raid progress",
+    compact: "Compact mode", faction: "Faction colors", runs: "Show best keys",
+    titleCut: "Title (top 0.1%)", titleLeft: n => `${n} to go`, titleIn: "in range!",
+    depleted: "Over time", notDone: "Not completed",
     done: "Done", reset: "Reset options", donate: "Buy me a coffee", settings: "Options",
     copy: "Copy Name-Realm", edit: "Change character", copied: "Copied!",
     hint: n => `Tip: press keys 1–${n}`, noLinks: "No links enabled. Turn them on in ⚙.",
@@ -45,7 +51,7 @@ const armoryLocale = (lang, r) => lang === "es" ? (r === "us" ? "es-mx" : "es-es
 // Available sites. on = enabled by default on install
 const SITES = [
   { id: "rio", scope: "char", tag: "RIO", color: "#e8762b", name: "Raider.io", on: true,
-    url: c => `https://raider.io/characters/${c.r}/${c.realm}/${c.n}` },
+    url: c => `https://raider.io/characters/${c.r}/${c.rio}/${c.n}` },
   { id: "wcl", scope: "char", tag: "WCL", color: "#a3742c", name: "Warcraft Logs", on: true,
     url: c => `https://www.warcraftlogs.com/character/${c.r}/${c.realm}/${c.n}` },
   { id: "armory", scope: "char", tag: "ARM", color: "#1f6fd1", name: t => t.armory, on: true,
@@ -57,13 +63,13 @@ const SITES = [
   { id: "dfa", scope: "char", tag: "DFA", color: "#2a9d8f", name: "Data for Azeroth", on: false,
     url: c => `https://www.dataforazeroth.com/characters/${c.r}/${c.realm}/${c.n}` },
   { id: "g-rio", scope: "guild", tag: "RIO", color: "#e8762b", name: "Raider.io", on: true,
-    url: c => `https://raider.io/guilds/${c.r}/${c.gRealm}/${c.g}` },
+    url: c => `https://raider.io/guilds/${c.r}/${c.gRio}/${c.g}` },
   { id: "g-wcl", scope: "guild", tag: "WCL", color: "#a3742c", name: "Warcraft Logs", on: true,
     url: c => `https://www.warcraftlogs.com/guild/${c.r}/${c.gRealm}/${c.g}` },
   { id: "g-wp", scope: "guild", tag: "WP", color: "#4b8f3a", name: "WoWProgress", on: false,
     url: c => `https://www.wowprogress.com/guild/${c.r}/${c.gRealm}/${c.g}` },
   { id: "g-armory", scope: "guild", tag: "ARM", color: "#1f6fd1", name: t => t.armory, on: false,
-    url: c => `https://worldofwarcraft.blizzard.com/${armoryLocale(c.lang, c.r)}/guild/${c.r}/${c.gRealm}/${slug(c.guild)}` },
+    url: c => `https://worldofwarcraft.blizzard.com/${armoryLocale(c.lang, c.r)}/guild/${c.r}/${c.gRealm}/${blizzSlug(c.guild)}` },
 ];
 
 const defaults = () => ({
@@ -72,6 +78,9 @@ const defaults = () => ({
   background: false,
   shortcuts: true,
   badge: true,
+  compact: false,
+  faction: true,
+  runsOpen: false,
 });
 
 let settings = defaults();
@@ -102,19 +111,18 @@ function show(v) {
   renderHeader();
   if (v === "links") renderLinks();
   if (v === "settings") renderSettings();
-  if (v === "config") { $("hint").textContent = VERSION; $("realm").focus(); }
+  if (v === "config") { $("hint").textContent = VERSION; $("removeChar").hidden = !char; $("realm").focus(); }
   $("stats").hidden = v !== "links" || !$("stats").childElementCount;
+  $("runs").hidden = v !== "links" || !settings.runsOpen || !$("runs").childElementCount;
 }
 
 // ---------- Raider.io profile ----------
 const currentProfile = () => profile && char && profile.key === charKey(char) ? profile : null;
 
-// The manual guild wins; otherwise use the one Raider.io reports
+// Guild as reported by Raider.io (it may be on another realm of the connected group)
 function guildOf() {
-  const manual = char.guild.trim(), p = currentProfile();
-  if (manual) return { name: manual, realm: char.realm };
-  if (p && p.guild) return { name: p.guild, realm: p.guildRealm };
-  return null;
+  const p = currentProfile();
+  return p && p.guild ? { name: p.guild, realm: p.guildRealm } : null;
 }
 
 async function refreshProfile() {
@@ -132,7 +140,8 @@ function renderHeader() {
   crest.classList.remove("avatar"); crest.style.backgroundImage = crest.style.boxShadow = "";
   $("title").style.color = "";
   $("guildLine").hidden = true;
-  $("stats").innerHTML = "";
+  $("stats").innerHTML = $("runs").innerHTML = "";
+  document.body.dataset.faction = "";
   if (!char) {
     crest.textContent = "N"; $("title").textContent = "Nezvi WoW"; $("subtitle").textContent = t().setup;
     return;
@@ -144,6 +153,7 @@ function renderHeader() {
   // Own line so long guild names don't get cut by the header buttons
   if (guild) { $("guildLine").textContent = `<${guild.name}>`; $("guildLine").title = guild.name; $("guildLine").hidden = false; }
   if (p) renderStats(p);
+  if (p && p.faction && settings.faction) document.body.dataset.faction = p.faction;
   if (p && p.thumb) { crest.classList.add("avatar"); crest.style.backgroundImage = `url("${p.thumb}")`; }
   const color = p && CLASS_COLORS[p.cls];
   if (color) { $("title").style.color = color; crest.style.boxShadow = `0 0 0 2px ${color}, 0 2px 10px ${color}44`; }
@@ -154,11 +164,28 @@ function renderStats(p) {
   const chip = (label, value, title, color) =>
     `<span class="stat" title="${title}"><b>${label}</b><span${color ? ` style="color:${color}"` : ""}>${value}</span></span>`;
   const [raidName, ...raidProgress] = (p.raid || "").split(" ");
+  const hasRuns = p.runs && p.runs.length;
+  const mplus = !p.score ? "" : !hasRuns ? chip("M+", p.score, t().score, p.scoreColor)
+    : `<button class="stat toggle${settings.runsOpen ? " open" : ""}" id="mplusBtn" title="${t().runs}">
+         <b>M+ <i>▾</i></b><span style="color:${p.scoreColor}">${p.score}</span></button>`;
+  if (hasRuns) renderRuns(p);
   $("stats").innerHTML = [
-    p.score ? chip("M+", p.score, t().score, p.scoreColor) : "",
+    mplus,
     p.ilvl ? chip("iLvl", p.ilvl, t().ilvl) : "",
     p.raid ? chip(raidName, raidProgress.join(" "), t().raid) : "",
   ].join("");
+}
+
+// Best key per dungeon this season, plus the distance to the title cutoff
+function renderRuns(p) {
+  const row = r => {
+    const lvl = !r.lvl ? `<span class="lvl muted" title="${t().notDone}">—</span>`
+      : `<span class="lvl${r.up ? "" : " muted"}"${r.up ? "" : ` title="${t().depleted}"`}>+${r.lvl}<i>${"★".repeat(r.up)}</i></span>`;
+    return `<div class="run"><span class="d" title="${r.name}">${r.d}</span>${lvl}<span class="sc">${r.score || ""}</span></div>`;
+  };
+  const title = !p.title ? ""
+    : `<div class="title-cut">${t().titleCut}: <b>${p.title}</b> · ${p.score >= p.title ? t().titleIn : t().titleLeft(p.title - p.score)}</div>`;
+  $("runs").innerHTML = `<div class="runs-grid">${p.runs.map(row).join("")}</div>${title}`;
 }
 
 function visibleSites() {
@@ -167,11 +194,13 @@ function visibleSites() {
 
 function renderLinks() {
   const guild_ = guildOf() || { name: "", realm: "" };
-  const c = { r: char.region, realm: slug(char.realm), n: encodeURIComponent(char.name.trim()),
-              g: encodeURIComponent(guild_.name), guild: guild_.name, gRealm: slug(guild_.realm), lang: settings.lang };
+  const c = { r: char.region, n: encodeURIComponent(char.name.trim()), lang: settings.lang,
+              realm: blizzSlug(char.realm), rio: encodeURIComponent(slug(char.realm)),
+              g: encodeURIComponent(guild_.name), guild: guild_.name,
+              gRealm: blizzSlug(guild_.realm), gRio: encodeURIComponent(slug(guild_.realm)) };
   const sites = visibleSites();
   const item = (s, i) =>
-    `<a class="link" href="${s.url(c)}" target="_blank">
+    `<a class="link" href="${s.url(c)}" target="_blank" title="${siteName(s)}">
        <span class="tag" style="background:${s.color}">${s.tag}</span>
        <span class="name">${siteName(s)}</span><kbd>${i + 1}</kbd>
      </a>`;
@@ -182,6 +211,7 @@ function renderLinks() {
     + guild.map((s, i) => item(s, i + char_.length)).join("");
   $("links").innerHTML = html || `<p class="empty">${t().noLinks}</p>`;
   $("links").classList.toggle("no-kbd", !settings.shortcuts);
+  $("links").classList.toggle("compact", settings.compact);
   $("openAll").hidden = sites.length < 2;
   const p = currentProfile();
   $("hint").textContent = p && p.notFound ? t().notFound
@@ -199,6 +229,8 @@ function renderSettings() {
   $("background").checked = settings.background;
   $("shortcuts").checked = settings.shortcuts;
   $("badge").checked = settings.badge;
+  $("compact").checked = settings.compact;
+  $("faction").checked = settings.faction;
   $("hint").textContent = VERSION;
 }
 
@@ -221,11 +253,17 @@ $("lang").onclick = e => {
 $("settings").addEventListener("change", e => {
   const el = e.target;
   if (el.dataset.site) settings.links[el.dataset.site] = el.checked;
-  else if (["background", "shortcuts", "badge"].includes(el.id)) settings[el.id] = el.checked;
+  else if (["background", "shortcuts", "badge", "compact", "faction"].includes(el.id)) settings[el.id] = el.checked;
   saveSettings();
 });
 
 $("edit").onclick = () => show("config");
+
+// The M+ chip expands the best keys panel; the choice is remembered
+$("stats").addEventListener("click", e => {
+  if (!e.target.closest("#mplusBtn")) return;
+  settings.runsOpen = !settings.runsOpen; saveSettings(); show(view);
+});
 
 $("copy").onclick = async () => {
   // In-game format: Name-Realm without spaces (works with /invite or /whisper)
@@ -243,10 +281,20 @@ $("links").addEventListener("click", e => {
   e.preventDefault(); open(a.href);
 });
 
+// Forget the character and go back to an empty setup
+$("removeChar").onclick = async () => {
+  await chrome.storage.sync.remove("char");
+  await chrome.storage.local.remove("profile");
+  char = profile = null;
+  $("realm").value = $("name").value = "";
+  show("config");
+};
+
 $("save").onclick = () => {
-  const c = { region: $("region").value, realm: $("realm").value,
-              name: $("name").value, guild: $("guild").value };
-  if (!c.realm.trim() || !c.name.trim()) { $("error").textContent = t().error; return; }
+  const c = { region: $("region").value, realm: $("realm").value.trim(), name: $("name").value.trim() };
+  if (!c.realm || !c.name) { $("error").textContent = t().error; return; }
+  const official = (REALMS[c.region] || []).find(r => realmKey(r) === realmKey(c.realm));
+  if (official) c.realm = $("realm").value = official;
   $("error").textContent = "";
   chrome.storage.sync.set({ char: c }, () => { char = c; show("links"); refreshProfile(); });
 };
@@ -269,16 +317,14 @@ function pickRealm(name) { $("realm").value = name; closeSuggest(); $("name").fo
 $("realm").addEventListener("input", () => {
   clearTimeout(realmTimer);
   const term = $("realm").value.trim();
-  if (term.length < 2) return closeSuggest();
-  realmTimer = setTimeout(async () => {
-    const realms = await searchRealms(term, $("region").value);
-    if ($("realm").value.trim() !== term) return; // The user kept typing
-    const options = realms.filter(r => r.toLowerCase() !== term.toLowerCase()).slice(0, 6);
+  if (!term) return closeSuggest();
+  realmTimer = setTimeout(() => {
+    const options = matchRealms(term, $("region").value).filter(r => realmKey(r) !== realmKey(term)).slice(0, 6);
     if (!options.length) return closeSuggest();
     suggest.innerHTML = options.map(r => `<li>${r.replace(/</g, "&lt;")}</li>`).join("");
     suggest.hidden = false;
     realmActive = -1;
-  }, 250);
+  }, 60);
 });
 
 $("realm").addEventListener("keydown", e => {
@@ -319,7 +365,7 @@ chrome.storage.sync.get(["char", "settings"], async data => {
   char = data.char || null;
   // Show the cached profile right away, then refresh it from Raider.io
   ({ profile = null } = await chrome.storage.local.get("profile"));
-  if (char) Object.keys(char).forEach(k => $(k).value = char[k]);
+  if (char) ["region", "realm", "name"].forEach(k => $(k).value = char[k] || "");
   applyLang();
   show(char ? "links" : "config");
   refreshProfile();

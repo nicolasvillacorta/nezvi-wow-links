@@ -5,12 +5,12 @@ A browser extension (Chrome, Edge and other Chromium browsers) for **World of Wa
 ## Features
 
 - **Character links:** Raider.io, Warcraft Logs, Armory and WoWProgress are enabled on install. Simple Armory and Data for Azeroth can be turned on in the options.
-- **Automatic guild detection:** the guild is looked up on Raider.io from your character, so you don't need to type it (you can still set one manually). Guild links use the guild's own realm, which works with connected realms.
+- **Automatic guild detection:** the guild is looked up on Raider.io from your character, so you don't need to type it. Guild links use the guild's own realm, which works with connected realms.
 - **Guild links:** Raider.io and Warcraft Logs are enabled by default (WoWProgress and the Armory are optional).
 - **Character card:** shows your in-game avatar and class color, fetched from Raider.io.
 - **Stats at a glance:** your current Mythic+ score (in Raider.io's score color), equipped item level and progress in the current raid, right in the popup.
 - **M+ score on the toolbar icon:** a small badge with your score, refreshed every 2 hours and when the browser starts (can be turned off in the options).
-- **Realm autocomplete:** suggests realm names for the selected region while you type.
+- **Realm autocomplete:** suggests realms of the selected region from Blizzard's official realm list while you type, however you spell them ("moonguard" finds Moon Guard).
 - **Options (⚙):**
   - Language: English or Spanish (the Armory opens in the same language).
   - Choose which links to show or hide.
@@ -59,7 +59,8 @@ The browser may show a warning about developer-mode extensions. That's expected 
 ## How to use it
 
 1. Click the extension icon.
-2. Pick your **region**, type your **realm** and **character name**, and click **Save**. Leave **Guild** empty to detect it automatically.
+2. Pick your **region**, type your **realm** and **character name**, and click **Save**. Your guild is detected automatically.
+   To remove your character, click the pencil and then **Remove character**.
 3. Click any link, or press its number key (`1`, `2`, `3`…) to open it.
 4. Use the icons at the top to **copy Name-Realm** (copy icon), **change character** (pencil) or open the **options** (⚙).
 
@@ -81,7 +82,8 @@ If you cloned the repository with Git, run `git pull` instead of downloading the
 | `manifest.json` | Extension definition (Manifest V3). |
 | `popup.html` | Popup markup and styles. |
 | `popup.js` | Popup logic: sites, languages, options and link building. |
-| `raiderio.js` | Raider.io API helpers (profile, current raid, realm search), shared by the popup and the background worker. |
+| `raiderio.js` | Raider.io API helpers (profile, current raid, best keys, title cutoff), shared by the popup and the background worker. |
+| `realms.js` | Official realm list per region, used for the autocomplete. |
 | `background.js` | Background service worker that refreshes the M+ score badge. |
 | `icons/` | Extension icons. `icon.svg` is the source for 32–128 px and `icon-small.svg` a simplified version for 16 px. |
 

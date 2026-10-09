@@ -2,7 +2,7 @@
 
 Copy-paste material for the Microsoft Edge Add-ons and Chrome Web Store submissions.
 
-- **Package:** build `dist/nezvi-wow-extension-<version>.zip` (only `manifest.json`, `popup.html`, `popup.js`, `raiderio.js`, `background.js` and `icons/*.png`, with `manifest.json` at the root).
+- **Package:** build `dist/nezvi-wow-extension-<version>.zip` (only `manifest.json`, `popup.html`, `popup.js`, `raiderio.js`, `realms.js`, `background.js` and `icons/*.png`, with `manifest.json` at the root).
 - **Privacy policy URL:** https://github.com/nicolasvillacorta/nezvi-wow-links/blob/main/PRIVACY.md
 - **Website:** https://github.com/nicolasvillacorta/nezvi-wow-links
 - **Support:** https://github.com/nicolasvillacorta/nezvi-wow-links/issues
@@ -118,7 +118,7 @@ Gives World of Warcraft players quick links to their character's and guild's pub
 **Permission justification — storage**
 
 ```text
-Saves the character the user enters (region, realm, name and optional guild) and the user's preferences (language, visible links), so they don't need to be entered every time the popup opens.
+Saves the character the user enters (region, realm and name) and the user's preferences (language, visible links), so they don't need to be entered every time the popup opens.
 ```
 
 **Permission justification — alarms**
@@ -130,7 +130,7 @@ Schedules a refresh every 2 hours so the character's Mythic+ score shown on the 
 **Permission justification — host permission (https://raider.io/*)**
 
 ```text
-Used only to call the Raider.io API: the character profile (region, realm and name) to show the guild, class, avatar, Mythic+ score, item level and raid progress; the raid static data to know which raid is current; and the realm search to suggest realm names while typing. No other site is accessed and no page content is read or modified.
+Used only to call the Raider.io API: the character profile (region, realm and name) to show the guild, class, avatar, Mythic+ score, item level and raid progress; and the raid and Mythic+ static data to know the current raid, the season's dungeons and the title score cutoff. No other site is accessed and no page content is read or modified.
 ```
 
 **Remote code:** No. All code is included in the package; the extension only fetches JSON data from the Raider.io API.
@@ -146,7 +146,7 @@ Replace the character with your own before submitting:
 ```text
 No account or login is needed.
 1. Click the extension icon in the toolbar.
-2. Choose region "US", realm "<YOUR REALM>" and character "<YOUR CHARACTER>", leave Guild empty and click Save.
+2. Choose region "US", realm "<YOUR REALM>" and character "<YOUR CHARACTER>", and click Save.
 3. The popup shows links to Raider.io, Warcraft Logs, Armory and WoWProgress. The guild, class color and avatar are detected automatically from the Raider.io API.
 4. Press 1–6 or click a link to open it. The gear icon opens the options (language, visible links, open in background).
 ```

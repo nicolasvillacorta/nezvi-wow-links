@@ -11,8 +11,12 @@
   body {
     width: 300px; margin: 0; padding: 14px;
     font: 13px/1.4 "Segoe UI", system-ui, sans-serif; color: var(--text);
-    background: radial-gradient(120% 60% at 50% 0%, #1d1a12 0%, var(--bg) 60%);
+    --glow: #1d1a12;
+    background: radial-gradient(120% 60% at 50% 0%, var(--glow) 0%, var(--bg) 60%);
   }
+  /* Faction colors */
+  body[data-faction="horde"] { --glow: #3a1414; }
+  body[data-faction="alliance"] { --glow: #13264a; }
 
   /* Header */
   header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
@@ -36,6 +40,22 @@
   }
   .stat b { font-size: 9.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
   .stat span { font-size: 13px; font-weight: 600; }
+  button.stat { font: inherit; color: var(--text); cursor: pointer; transition: border-color .15s, background .15s; }
+  button.stat:hover { border-color: #3a404c; background: var(--panel-2); }
+  .stat i { font-style: normal; display: inline-block; transition: transform .2s; }
+  .stat.open { border-color: var(--gold-2); }
+  .stat.open i { transform: rotate(180deg); }
+  /* Best keys panel */
+  .runs { margin: -6px 0 12px; padding: 8px 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  .runs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 14px; }
+  .run { display: grid; grid-template-columns: 34px 1fr auto; align-items: baseline; font-size: 11.5px; }
+  .run .d { color: var(--muted); font-weight: 600; font-size: 10.5px; }
+  .run .lvl { font-weight: 600; }
+  .run .lvl i { font-style: normal; color: var(--gold); font-size: 9px; margin-left: 2px; }
+  .run .muted { color: #5d626c; }
+  .run .sc { color: var(--muted); font-size: 11px; }
+  .title-cut { margin-top: 7px; padding-top: 6px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+  .title-cut b { color: var(--gold); }
   .who p { margin: 0; font-size: 11.5px; color: var(--muted);
            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tools { display: flex; gap: 4px; flex: none; }
@@ -105,6 +125,16 @@
   }
   .link:hover kbd { color: var(--gold); border-color: var(--gold-2); }
   .no-kbd .link kbd { display: none; }
+  /* Compact mode: colored tags in a grid, names in the tooltip */
+  #links.compact { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  #links.compact .section { grid-column: 1 / -1; margin: 6px 2px 0; }
+  #links.compact .section:first-child { margin-top: 0; }
+  #links.compact .empty { grid-column: 1 / -1; }
+  #links.compact .link { position: relative; justify-content: center; margin: 0; padding: 11px 4px; }
+  #links.compact .link:hover { transform: translateY(-1px); }
+  #links.compact .tag { width: 40px; font-size: 11px; padding: 4px 0; }
+  #links.compact .name { display: none; }
+  #links.compact kbd { position: absolute; top: 4px; right: 5px; padding: 0; border: 0; font-size: 9.5px; }
 
   /* Options */
   .seg { display: grid; grid-template-columns: 1fr 1fr; padding: 3px; gap: 3px;
@@ -173,6 +203,7 @@
   </div>
 </header>
 <div class="stats" id="stats" hidden></div>
+<div class="runs" id="runs" hidden></div>
 
 <!-- View: character setup -->
 <div id="config" hidden>
@@ -191,9 +222,8 @@
   </div>
   <label for="name" data-i18n="name"></label>
   <input id="name" data-i18n-ph="namePh">
-  <label for="guild"><span data-i18n="guild"></span> <span style="opacity:.6" data-i18n="optional"></span></label>
-  <input id="guild" data-i18n-ph="guildPh">
   <button class="primary" id="save" data-i18n="save"></button>
+  <button class="secondary" id="removeChar" data-i18n="removeChar" hidden></button>
   <p class="error" id="error"></p>
 </div>
 
@@ -222,6 +252,10 @@
       <span class="switch"><input type="checkbox" id="shortcuts"><span></span></span></label>
     <label class="opt"><span class="txt" data-i18n="badge"></span>
       <span class="switch"><input type="checkbox" id="badge"><span></span></span></label>
+    <label class="opt"><span class="txt" data-i18n="compact"></span>
+      <span class="switch"><input type="checkbox" id="compact"><span></span></span></label>
+    <label class="opt"><span class="txt" data-i18n="faction"></span>
+      <span class="switch"><input type="checkbox" id="faction"><span></span></span></label>
   </div>
   <button class="primary" id="done" data-i18n="done"></button>
   <button class="secondary" id="reset" data-i18n="reset"></button>
@@ -231,5 +265,6 @@
   <span id="hint"></span>
   <a class="donate" id="donate" target="_blank"><span class="heart">♥</span> <span data-i18n="donate"></span></a>
 </footer>
+<script src="realms.js"></script>
 <script src="raiderio.js"></script>
 <script src="popup.js"></script>
