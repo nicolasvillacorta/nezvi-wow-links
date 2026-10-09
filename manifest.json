@@ -3,7 +3,7 @@
   "name": "Nezvi WoW Extension",
   "short_name": "Nezvi WoW",
   "version": "1.1",
-  "description": "Raider.io, Warcraft Logs y más de tu personaje, a un click.",
+  "description": "Your character's Raider.io, Warcraft Logs, Armory and more, one click away.",
   "action": { "default_popup": "popup.html" },
   "permissions": ["storage"]
 }

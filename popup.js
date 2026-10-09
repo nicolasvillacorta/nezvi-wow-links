@@ -1,8 +1,8 @@
 const $ = id => document.getElementById(id);
-// Los sitios usan el reino en minúsculas, con guiones y sin apóstrofes
+// Sites expect the realm lowercase, hyphenated and without apostrophes
 const slug = s => s.trim().toLowerCase().replace(/'/g, "").replace(/\s+/g, "-");
 
-// Reemplazar por tu link de donaciones (Cafecito, Ko-fi, PayPal, etc.)
+// Replace with your donation link (Cafecito, Ko-fi, PayPal, etc.)
 const DONATE_URL = "https://cafecito.app/TU_USUARIO";
 const VERSION = "v" + chrome.runtime.getManifest().version;
 
@@ -31,10 +31,10 @@ const T = {
   },
 };
 
-// Locale de la Armería según idioma y región
+// Armory locale based on language and region
 const armoryLocale = (lang, r) => lang === "es" ? (r === "us" ? "es-mx" : "es-es") : (r === "eu" ? "en-gb" : "en-us");
 
-// Sitios disponibles. on = activo por defecto al instalar
+// Available sites. on = enabled by default on install
 const SITES = [
   { id: "rio", scope: "char", tag: "RIO", color: "#e8762b", name: "Raider.io", on: true,
     url: c => `https://raider.io/characters/${c.r}/${c.realm}/${c.n}` },
@@ -72,7 +72,7 @@ let prevView = "config";
 const t = () => T[settings.lang];
 const siteName = s => typeof s.name === "function" ? s.name(t()) : s.name;
 
-// ---------- Textos ----------
+// ---------- Text ----------
 function applyLang() {
   document.documentElement.lang = settings.lang;
   document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t()[el.dataset.i18n]);
@@ -81,7 +81,7 @@ function applyLang() {
   document.querySelectorAll("#lang button").forEach(b => b.classList.toggle("on", b.dataset.lang === settings.lang));
 }
 
-// ---------- Vistas ----------
+// ---------- Views ----------
 function show(v) {
   view = v;
   $("config").hidden = v !== "config";
@@ -144,7 +144,7 @@ function renderSettings() {
   $("hint").textContent = VERSION;
 }
 
-// ---------- Acciones ----------
+// ---------- Actions ----------
 const saveSettings = () => chrome.storage.sync.set({ settings });
 const open = url => chrome.tabs.create({ url, active: !settings.background });
 
@@ -170,7 +170,7 @@ $("settings").addEventListener("change", e => {
 $("edit").onclick = () => show("config");
 
 $("copy").onclick = async () => {
-  // Formato del juego: Nombre-Reino, sin espacios (sirve para /invite o /whisper)
+  // In-game format: Name-Realm without spaces (works with /invite or /whisper)
   await navigator.clipboard.writeText(`${char.name.trim()}-${char.realm.trim().replace(/\s+/g, "")}`);
   $("hint").textContent = t().copied;
   setTimeout(() => view === "links" && renderLinks(), 1500);
@@ -178,7 +178,7 @@ $("copy").onclick = async () => {
 
 $("openAll").onclick = () => document.querySelectorAll(".link").forEach(a => open(a.href));
 
-// Clic normal: respeta "abrir en segundo plano"
+// Plain click: honors the "open in background" option
 $("links").addEventListener("click", e => {
   const a = e.target.closest(".link");
   if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
@@ -193,21 +193,21 @@ $("save").onclick = () => {
   chrome.storage.sync.set({ char: c }, () => { char = c; show("links"); });
 };
 
-// Enter guarda desde cualquier campo
+// Enter saves from any field
 $("config").addEventListener("keydown", e => { if (e.key === "Enter") $("save").click(); });
 
-// Atajos: las teclas 1–9 abren el link correspondiente
+// Shortcuts: keys 1–9 open the matching link
 document.addEventListener("keydown", e => {
   if (view !== "links" || !settings.shortcuts) return;
   const a = document.querySelectorAll(".link")[Number(e.key) - 1];
   if (a) open(a.href);
 });
 
-// ---------- Inicio ----------
+// ---------- Startup ----------
 $("donate").href = DONATE_URL;
 chrome.storage.sync.get(["char", "settings"], data => {
   const d = defaults();
-  // Mezcla con los defaults para que los sitios nuevos aparezcan con su valor por defecto
+  // Merge with defaults so newly added sites show up with their default value
   settings = { ...d, ...data.settings, links: { ...d.links, ...(data.settings && data.settings.links) } };
   char = data.char || null;
   if (char) Object.keys(char).forEach(k => $(k).value = char[k]);
