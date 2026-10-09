@@ -49,7 +49,8 @@ FEATURES
 • Your Mythic+ score, item level and current raid progress at a glance.
 • Your M+ score on the toolbar icon, always up to date.
 • Realm autocomplete while you set up your character.
-• Player lookup: paste Name-Realm copied in game and Raider.io opens instantly.
+• Player lookup: paste Name-Realm copied in game and Raider.io opens instantly, with your recent searches one click away.
+• Great Vault Mythic+ progress: runs this week and the key level behind each reward.
 • Open the popup with Alt+Shift+R.
 • Keyboard shortcuts: press 1–9 to open a link.
 • Copy your Name-Realm in the in-game format, ready for /invite or /w.
@@ -83,7 +84,8 @@ FUNCIONES
 • Tu puntaje de Mítica+, nivel de objeto y progreso en la raid actual de un vistazo.
 • Tu puntaje M+ en el ícono de la barra, siempre actualizado.
 • Autocompletado de reinos al configurar tu personaje.
-• Buscador de jugadores: pegá Nombre-Reino copiado del juego y se abre su Raider.io al instante.
+• Buscador de jugadores: pegá Nombre-Reino copiado del juego y se abre su Raider.io al instante, con tus búsquedas recientes a un clic.
+• Progreso de Míticas+ en la Cámara: llaves de la semana y el nivel de cada recompensa.
 • Abrí el popup con Alt+Shift+R.
 • Atajos de teclado: apretá 1–9 para abrir un link.
 • Copiá tu Nombre-Reino en el formato del juego, listo para /invite o /w.

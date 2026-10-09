@@ -8,7 +8,9 @@ A browser extension (Chrome, Edge and other Chromium browsers) for **World of Wa
 - **Automatic guild detection:** the guild is looked up on Raider.io from your character, so you don't need to type it. Guild links use the guild's own realm, which works with connected realms.
 - **Guild links:** Raider.io and Warcraft Logs are enabled by default (WoWProgress and the Armory are optional).
 - **Character card:** shows your in-game avatar and class color, fetched from Raider.io.
-- **Stats at a glance:** your current Mythic+ score (in Raider.io's score color), equipped item level and progress in the current raid, right in the popup.
+- **Stats at a glance:** your current Mythic+ score (in Raider.io's score color), equipped item level, progress in the current raid and your Great Vault Mythic+ row (runs this week out of 8), right in the popup.
+- **Best keys and vault:** click the M+ or Vault chip to see your best key per dungeon, the key level behind each Mythic+ vault reward (1st, 4th and 8th best run of the week) and how far you are from the season title.
+  The raid and world rows of the vault aren't available from public APIs, so only the Mythic+ row is shown.
 - **M+ score on the toolbar icon:** a small badge with your score, refreshed every 2 hours and when the browser starts (can be turned off in the options).
 - **Realm autocomplete:** suggests realms of the selected region from Blizzard's official realm list while you type, however you spell them ("moonguard" finds Moon Guard).
 - **Options (⚙):**
@@ -17,7 +19,7 @@ A browser extension (Chrome, Edge and other Chromium browsers) for **World of Wa
   - Open links in the background.
   - Show or hide keyboard shortcuts.
   - Show or hide the M+ score on the toolbar icon.
-- **Player lookup:** paste a name copied in game (`Name-Realm`, or just `Name` for your own realm) and Raider.io opens right away. Press `Ctrl+V` as soon as the popup opens, or use the magnifier button to type a name.
+- **Player lookup:** paste a name copied in game (`Name-Realm`, or just `Name` for your own realm) and Raider.io opens right away. Press `Ctrl+V` as soon as the popup opens, or use the magnifier button to type a name. Your last 5 searches are listed there to reopen them in one click.
 - **Open the popup from the keyboard:** `Alt+Shift+R` (change it at `chrome://extensions/shortcuts` or `edge://extensions/shortcuts`). Copy a name in game, press `Alt+Shift+R`, then `Ctrl+V`.
 - **Keyboard shortcuts:** with the popup open, keys `1`–`9` open each link.
 - **Copy Name-Realm:** copies your character in the in-game format, ready for `/invite` or `/w`.

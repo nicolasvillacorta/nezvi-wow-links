@@ -20,6 +20,7 @@ const T = {
     copy: "Copiar Nombre-Reino", edit: "Cambiar personaje", copied: "¡Copiado!",
     lookupPh: "Buscar en Raider.io: Nombre-Reino", lookupNeedRealm: "Agregá el reino: Nombre-Reino",
     lookupNoRealm: r => `No encontramos el reino "${r}"`, search: "Buscar jugador en Raider.io (o pegá con Ctrl+V)",
+    vault: "Cámara", vaultTip: s => `Recompensas de Míticas+ en la Cámara: ${s}`, recent: "Búsquedas recientes", clear: "Borrar",
     hint: n => `Tip: usá las teclas 1–${n}`, noLinks: "No hay links activos. Activalos en ⚙.",
     armory: "Armería", notFound: "No encontramos el personaje en Raider.io",
   },
@@ -37,6 +38,7 @@ const T = {
     copy: "Copy Name-Realm", edit: "Change character", copied: "Copied!",
     lookupPh: "Search Raider.io: Name-Realm", lookupNeedRealm: "Add the realm: Name-Realm",
     lookupNoRealm: r => `Realm "${r}" not found`, search: "Search a player on Raider.io (or paste with Ctrl+V)",
+    vault: "Vault", vaultTip: s => `Great Vault Mythic+ rewards: ${s}`, recent: "Recent searches", clear: "Clear",
     hint: n => `Tip: press keys 1–${n}`, noLinks: "No links enabled. Turn them on in ⚙.",
     armory: "Armory", notFound: "Character not found on Raider.io",
   },
@@ -93,6 +95,7 @@ let profile = null; // Raider.io data for char, see fetchProfile in raiderio.js
 let view = "config"; // config | links | settings
 let prevView = "config";
 const t = () => T[settings.lang];
+const esc = s => String(s).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
 const siteName = s => typeof s.name === "function" ? s.name(t()) : s.name;
 
 // ---------- Text ----------
@@ -176,8 +179,14 @@ function renderStats(p) {
     : `<button class="stat toggle${settings.runsOpen ? " open" : ""}" id="mplusBtn" title="${t().runs}">
          <b>M+ <i>▾</i></b><span style="color:${p.scoreColor}">${p.score}</span></button>`;
   if (hasRuns) renderRuns(p);
+  const v = p.vault;
+  const slots = v ? v.slots.map(l => l ? `+${l}` : "—").join(" · ") : "";
+  const vault = !v || !p.score ? ""
+    : `<button class="stat toggle${v.done >= 8 ? " full" : ""}" title="${t().vaultTip(slots)}">
+         <b>${t().vault}</b><span>${Math.min(v.done, 8)}/8</span></button>`;
   $("stats").innerHTML = [
     mplus,
+    vault,
     p.ilvl ? chip("iLvl", p.ilvl, t().ilvl) : "",
     p.raid ? chip(raidName, raidProgress.join(" "), t().raid) : "",
   ].join("");
@@ -192,7 +201,10 @@ function renderRuns(p) {
   };
   const title = !p.title ? ""
     : `<div class="title-cut">${t().titleCut}: <b>${p.title}</b> · ${p.score >= p.title ? t().titleIn : t().titleLeft(p.title - p.score)}</div>`;
-  $("runs").innerHTML = `<div class="runs-grid">${p.runs.map(row).join("")}</div>${title}`;
+  const v = p.vault;
+  const vault = !v ? "" : `<div class="vault-line">${t().vault} <b>${Math.min(v.done, 8)}/8</b>${
+    v.slots.map(l => l ? `<span class="slot">+${l}</span>` : `<span class="slot muted">—</span>`).join("")}</div>`;
+  $("runs").innerHTML = `${vault}<div class="runs-grid">${p.runs.map(row).join("")}</div>${title}`;
 }
 
 function visibleSites() {
@@ -267,7 +279,7 @@ $("edit").onclick = () => show("config");
 
 // The M+ chip expands the best keys panel; the choice is remembered
 $("stats").addEventListener("click", e => {
-  if (!e.target.closest("#mplusBtn")) return;
+  if (!e.target.closest(".toggle")) return;
   settings.runsOpen = !settings.runsOpen; saveSettings(); show(view);
 });
 
@@ -376,7 +388,31 @@ function toggleLookup(open = $("lookup").hidden) {
   $("lookup").hidden = !open;
   $("searchBtn").classList.toggle("active", open);
   $("lookupError").hidden = true;
-  if (open) $("lookupInput").focus(); else $("lookupInput").value = "";
+  if (open) { $("lookupInput").focus(); renderRecent(); } else $("lookupInput").value = "";
+}
+
+// Last 5 players you looked up, kept only in this browser
+const playerKey = p => [p.region, slug(p.realm), p.name.toLowerCase()].join("/");
+
+async function rememberPlayer(p) {
+  const { recent = [] } = await chrome.storage.local.get("recent");
+  const entry = { name: p.name, region: p.region, realm: p.realm };
+  await chrome.storage.local.set({ recent: [entry, ...recent.filter(r => playerKey(r) !== playerKey(p))].slice(0, 5) });
+}
+
+async function renderRecent() {
+  const { recent = [] } = await chrome.storage.local.get("recent");
+  $("recent").hidden = !recent.length;
+  $("recent").innerHTML = !recent.length ? "" :
+    `<div class="recent-head"><span>${t().recent}</span><button id="clearRecent">${t().clear}</button></div>`
+    + recent.map((r, i) => `<button class="recent-item" data-i="${i}">
+        <span>${esc(r.name)}</span><small>${esc(r.realm)} · ${r.region.toUpperCase()}</small></button>`).join("");
+}
+
+// Save to the history first: opening a tab in the foreground closes the popup
+async function openPlayer(p) {
+  await rememberPlayer(p);
+  chrome.tabs.create({ url: `https://raider.io/characters/${p.region}/${encodeURIComponent(slug(p.realm))}/${encodeURIComponent(p.name)}` });
 }
 
 function lookup() {
@@ -384,8 +420,16 @@ function lookup() {
   if (!p) return;
   if (p.error) { $("lookupError").textContent = p.error; $("lookupError").hidden = false; return; }
   $("lookupInput").value = "";
-  chrome.tabs.create({ url: `https://raider.io/characters/${p.region}/${encodeURIComponent(slug(p.realm))}/${encodeURIComponent(p.name)}` });
+  openPlayer(p);
 }
+
+$("recent").addEventListener("click", async e => {
+  if (e.target.closest("#clearRecent")) { await chrome.storage.local.remove("recent"); return renderRecent(); }
+  const item = e.target.closest(".recent-item");
+  if (!item) return;
+  const { recent = [] } = await chrome.storage.local.get("recent");
+  if (recent[item.dataset.i]) openPlayer(recent[item.dataset.i]);
+});
 
 $("searchBtn").onclick = () => toggleLookup();
 $("lookupInput").addEventListener("keydown", e => {

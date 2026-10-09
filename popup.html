@@ -47,6 +47,12 @@
   .stat i { font-style: normal; display: inline-block; transition: transform .2s; }
   .stat.open { border-color: var(--gold-2); }
   .stat.open i { transform: rotate(180deg); }
+  .stat.full span { color: var(--gold); }
+  .vault-line { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; padding-bottom: 6px;
+                border-bottom: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+  .vault-line b { color: var(--text); }
+  .vault-line .slot { padding: 1px 6px; border-radius: 4px; background: var(--panel-2); color: var(--text); font-weight: 600; }
+  .vault-line .slot.muted { color: #5d626c; }
   /* Best keys panel */
   .runs { margin: -6px 0 12px; padding: 8px 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
   .runs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 14px; }
@@ -110,6 +116,17 @@
   .lookup input { padding-left: 31px; }
   .lookup input::placeholder { font-size: 12px; }
   .lookup-error { color: #ff8a80; font-size: 11px; margin: 4px 2px 0; }
+  .recent { margin-top: 6px; padding: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  .recent-head { display: flex; justify-content: space-between; align-items: center; padding: 2px 6px 4px;
+                 font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .recent-head button { font: inherit; text-transform: none; letter-spacing: 0; color: var(--muted); background: none; border: 0; cursor: pointer; padding: 0; }
+  .recent-head button:hover { color: var(--gold); }
+  .recent-item {
+    display: flex; width: 100%; justify-content: space-between; align-items: baseline; gap: 8px; padding: 5px 6px;
+    font: inherit; color: var(--text); background: none; border: 0; border-radius: 5px; cursor: pointer; text-align: left;
+  }
+  .recent-item:hover { background: #f2c45a1f; color: var(--gold); }
+  .recent-item small { color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .empty { color: var(--muted); text-align: center; padding: 14px 0; margin: 0; }
 
   /* Links */
@@ -217,6 +234,7 @@
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
   <input id="lookupInput" data-i18n-ph="lookupPh" autocomplete="off" spellcheck="false">
   <p class="lookup-error" id="lookupError" hidden></p>
+  <div class="recent" id="recent" hidden></div>
 </div>
 <div class="stats" id="stats" hidden></div>
 <div class="runs" id="runs" hidden></div>
