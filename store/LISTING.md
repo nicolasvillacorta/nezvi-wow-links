@@ -2,7 +2,7 @@
 
 Copy-paste material for the Microsoft Edge Add-ons and Chrome Web Store submissions.
 
-- **Package:** build `dist/nezvi-wow-extension-<version>.zip` (only `manifest.json`, `popup.html`, `popup.js`, `raiderio.js`, `realms.js`, `background.js` and `icons/*.png`, with `manifest.json` at the root).
+- **Package:** build `dist/nezvi-wow-extension-<version>.zip` (only `manifest.json`, `popup.html`, `popup.js`, `raiderio.js`, `realms.js` and `icons/*.png`, with `manifest.json` at the root).
 - **Privacy policy URL:** https://github.com/nicolasvillacorta/nezvi-wow-links/blob/main/PRIVACY.md
 - **Website:** https://github.com/nicolasvillacorta/nezvi-wow-links
 - **Support:** https://github.com/nicolasvillacorta/nezvi-wow-links/issues
@@ -47,7 +47,6 @@ FEATURES
 • Guild links to Raider.io and Warcraft Logs (WoWProgress and the Armory are optional).
 • Your in-game avatar and class color in the popup.
 • Your Mythic+ score, item level and current raid progress at a glance.
-• Your M+ score on the toolbar icon, always up to date.
 • Realm autocomplete while you set up your character.
 • Player lookup: paste Name-Realm copied in game and Raider.io opens instantly, with your recent searches one click away.
 • Open the popup with Alt+Shift+R.
@@ -81,7 +80,6 @@ FUNCIONES
 • Links de la guild a Raider.io y Warcraft Logs (WoWProgress y la Armería son opcionales).
 • El avatar y el color de clase de tu personaje en el popup.
 • Tu puntaje de Mítica+, nivel de objeto y progreso en la raid actual de un vistazo.
-• Tu puntaje M+ en el ícono de la barra, siempre actualizado.
 • Autocompletado de reinos al configurar tu personaje.
 • Buscador de jugadores: pegá Nombre-Reino copiado del juego y se abre su Raider.io al instante, con tus búsquedas recientes a un clic.
 • Abrí el popup con Alt+Shift+R.
@@ -121,12 +119,6 @@ Gives World of Warcraft players quick links to their character's and guild's pub
 
 ```text
 Saves the character the user enters (region, realm and name) and the user's preferences (language, visible links), so they don't need to be entered every time the popup opens.
-```
-
-**Permission justification — alarms**
-
-```text
-Schedules a refresh every 2 hours so the character's Mythic+ score shown on the toolbar icon badge stays up to date without the user opening the popup.
 ```
 
 **Permission justification — host permission (https://raider.io/*)**

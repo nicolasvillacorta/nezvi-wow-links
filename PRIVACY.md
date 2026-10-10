@@ -22,14 +22,13 @@ This data is saved with the browser's built-in extension storage (`chrome.storag
 
 ## Data sent to third parties
 
-To show your character's guild, class, avatar, Mythic+ score, item level and raid progress, the extension sends your **region, realm and character name** to the public [Raider.io](https://raider.io) API. This happens when you open the popup and in the background about every 2 hours, to keep the score on the toolbar icon up to date. No other data is sent, and no identifier for you or your browser is included. Raider.io's handling of requests is covered by its own privacy policy.
+To show your character's guild, class, avatar, Mythic+ score, item level and raid progress, the extension sends your **region, realm and character name** to the public [Raider.io](https://raider.io) API. This only happens when you open the popup. No other data is sent, and no identifier for you or your browser is included. Raider.io's handling of requests is covered by its own privacy policy.
 
 When you click a link, the browser opens that website (Raider.io, Warcraft Logs, the World of Warcraft Armory, WoWProgress, Simple Armory or Data for Azeroth). Those sites are independent and have their own privacy policies.
 
 ## Permissions
 
 - **storage:** saves your character and preferences.
-- **alarms:** schedules the periodic refresh of the M+ score shown on the toolbar icon.
 - **Access to raider.io:** looks up your character's guild, class, avatar, score, item level and raid progress.
 
 ## Removing your data

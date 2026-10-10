@@ -12,7 +12,7 @@ const T = {
     save: "Guardar", error: "Completá el reino y el personaje.",
     language: "Idioma", charLinks: "Links del personaje", guildLinks: "Links de la guild",
     prefs: "Preferencias", background: "Abrir links en segundo plano", shortcuts: "Mostrar atajos de teclado",
-    badge: "Mostrar puntaje M+ en el ícono", score: "Puntaje Mítica+", ilvl: "Nivel de objeto equipado", raid: "Progreso en la raid actual",
+    score: "Puntaje Mítica+", ilvl: "Nivel de objeto equipado", raid: "Progreso en la raid actual",
     compact: "Modo compacto", faction: "Colores de facción", runs: "Ver mejores llaves",
     titleCut: "Título (top 0,1%)", titleLeft: n => `te faltan ${n}`, titleIn: "¡en rango!",
     depleted: "Fuera de tiempo", notDone: "Sin completar",
@@ -30,7 +30,7 @@ const T = {
     save: "Save", error: "Enter a realm and a character.",
     language: "Language", charLinks: "Character links", guildLinks: "Guild links",
     prefs: "Preferences", background: "Open links in background", shortcuts: "Show keyboard shortcuts",
-    badge: "Show M+ score on icon", score: "Mythic+ score", ilvl: "Equipped item level", raid: "Current raid progress",
+    score: "Mythic+ score", ilvl: "Equipped item level", raid: "Current raid progress",
     compact: "Compact mode", faction: "Faction colors", runs: "Show best keys",
     titleCut: "Title (top 0.1%)", titleLeft: n => `${n} to go`, titleIn: "in range!",
     depleted: "Over time", notDone: "Not completed",
@@ -83,7 +83,6 @@ const defaults = () => ({
   links: Object.fromEntries(SITES.map(s => [s.id, s.on])),
   background: false,
   shortcuts: true,
-  badge: true,
   compact: false,
   faction: true,
   runsOpen: false,
@@ -237,7 +236,6 @@ function renderSettings() {
   $("guildOpts").innerHTML = SITES.filter(s => s.scope === "guild").map(row).join("");
   $("background").checked = settings.background;
   $("shortcuts").checked = settings.shortcuts;
-  $("badge").checked = settings.badge;
   $("compact").checked = settings.compact;
   $("faction").checked = settings.faction;
   $("hint").textContent = VERSION;
@@ -262,7 +260,7 @@ $("lang").onclick = e => {
 $("settings").addEventListener("change", e => {
   const el = e.target;
   if (el.dataset.site) settings.links[el.dataset.site] = el.checked;
-  else if (["background", "shortcuts", "badge", "compact", "faction"].includes(el.id)) settings[el.id] = el.checked;
+  else if (["background", "shortcuts", "compact", "faction"].includes(el.id)) settings[el.id] = el.checked;
   saveSettings();
 });
 

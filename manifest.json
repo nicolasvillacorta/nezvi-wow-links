@@ -17,9 +17,6 @@
       "32": "icons/icon-32.png"
     }
   },
-  "background": {
-    "service_worker": "background.js"
-  },
   "commands": {
     "_execute_action": {
       "suggested_key": {
@@ -29,8 +26,7 @@
     }
   },
   "permissions": [
-    "storage",
-    "alarms"
+    "storage"
   ],
   "host_permissions": [
     "https://raider.io/*"

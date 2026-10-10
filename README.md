@@ -10,14 +10,12 @@ A browser extension (Chrome, Edge and other Chromium browsers) for **World of Wa
 - **Character card:** shows your in-game avatar and class color, fetched from Raider.io.
 - **Stats at a glance:** your current Mythic+ score (in Raider.io's score color), equipped item level, progress in the current raid, right in the popup.
 - **Best keys:** click the M+ chip to see your best key per dungeon this season and how far you are from the season title.
-- **M+ score on the toolbar icon:** a small badge with your score, refreshed every 2 hours and when the browser starts (can be turned off in the options).
 - **Realm autocomplete:** suggests realms of the selected region from Blizzard's official realm list while you type, however you spell them ("moonguard" finds Moon Guard).
 - **Options (⚙):**
   - Language: English or Spanish (the Armory opens in the same language).
   - Choose which links to show or hide.
   - Open links in the background.
   - Show or hide keyboard shortcuts.
-  - Show or hide the M+ score on the toolbar icon.
 - **Player lookup:** paste a name copied in game (`Name-Realm`, or just `Name` for your own realm) and Raider.io opens right away. Press `Ctrl+V` as soon as the popup opens, or use the magnifier button to type a name. Your last 5 searches are listed there to reopen them in one click.
 - **Open the popup from the keyboard:** `Alt+Shift+R` (change it at `chrome://extensions/shortcuts` or `edge://extensions/shortcuts`). Copy a name in game, press `Alt+Shift+R`, then `Ctrl+V`.
 - **Keyboard shortcuts:** with the popup open, keys `1`–`9` open each link.
@@ -84,9 +82,8 @@ If you cloned the repository with Git, run `git pull` instead of downloading the
 | `manifest.json` | Extension definition (Manifest V3). |
 | `popup.html` | Popup markup and styles. |
 | `popup.js` | Popup logic: sites, languages, options and link building. |
-| `raiderio.js` | Raider.io API helpers (profile, current raid, best keys, title cutoff), shared by the popup and the background worker. |
+| `raiderio.js` | Raider.io API helpers (profile, current raid, best keys, title cutoff). |
 | `realms.js` | Official realm list per region, used for the autocomplete. |
-| `background.js` | Background service worker that refreshes the M+ score badge. |
 | `icons/` | Extension icons. `icon.svg` is the source for 32–128 px and `icon-small.svg` a simplified version for 16 px. |
 
 To add a new site, add an entry to the `SITES` list in `popup.js`.

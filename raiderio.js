@@ -1,4 +1,4 @@
-// Raider.io helpers shared by the popup and the background worker
+// Raider.io helpers used by the popup
 
 // Realm slugs: lowercase, hyphenated, without apostrophes or parentheses.
 // Raider.io keeps accents ("aggra-português"); Blizzard and most other sites drop them ("aggra-portugues")
