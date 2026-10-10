@@ -150,7 +150,8 @@ function show(v) {
   $("searchBtn").hidden = v === "settings";
   if (v === "settings") toggleLookup(false);
   $("stats").hidden = v !== "links" || !$("stats").childElementCount;
-  $("runs").hidden = v !== "links" || !settings.runsOpen || !$("runs").childElementCount;
+  // The large size has room for the best keys panel, so it's always open there
+  $("runs").hidden = v !== "links" || !(settings.runsOpen || settings.size === "l") || !$("runs").childElementCount;
 }
 
 // ---------- Raider.io profile ----------
@@ -218,7 +219,7 @@ function renderRuns(p) {
   const row = r => {
     const lvl = !r.lvl ? `<span class="lvl muted" title="${t().notDone}">—</span>`
       : `<span class="lvl${r.up ? "" : " muted"}"${r.up ? "" : ` title="${t().depleted}"`}>+${r.lvl}<i>${"★".repeat(r.up)}</i></span>`;
-    return `<div class="run"><span class="d" title="${r.name}">${r.d}</span>${lvl}<span class="sc">${r.score || ""}</span></div>`;
+    return `<div class="run"><span class="d" title="${r.name}"><span class="ab">${r.d}</span><span class="full">${r.name}</span></span>${lvl}<span class="sc">${r.score || ""}</span></div>`;
   };
   const title = !p.title ? ""
     : `<div class="title-cut">${t().titleCut}: <b>${p.title}</b> · ${p.score >= p.title ? t().titleIn : t().titleLeft(p.title - p.score)}</div>`;
@@ -298,7 +299,7 @@ $("styles").onclick = e => {
 $("sizes").onclick = e => {
   const b = e.target.closest("button");
   if (!b) return;
-  settings.size = b.dataset.size; saveSettings(); applyLook(settings); applyLang();
+  settings.size = b.dataset.size; saveSettings(); applyLook(settings); applyLang(); show(view);
 };
 $("settings").addEventListener("change", e => {
   const el = e.target;

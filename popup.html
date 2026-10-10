@@ -16,9 +16,53 @@
     --glow: var(--theme-glow);
     background: radial-gradient(120% 60% at 50% 0%, var(--glow) 0%, var(--bg) 60%);
   }
-  /* Sizes: the whole popup scales, so every style keeps its proportions */
-  body[data-size="m"] { zoom: 1.3; }
-  body[data-size="l"] { zoom: 1.6; }
+  /* Layout: in the small and medium sizes the columns dissolve into a single flow */
+  .cols { display: flex; flex-direction: column; }
+  .side, .main { display: contents; }
+  #lookup { order: -1; }
+
+  /* Medium: wider, bigger text, links in two columns */
+  body[data-size="m"] { width: 400px; padding: 16px; font-size: 13.5px; }
+  body[data-size="m"] .crest { width: 40px; height: 40px; font-size: 17px; }
+  body[data-size="m"] header { grid-template-columns: 40px 1fr auto; }
+  body[data-size="m"] .who h1 { font-size: 17px; }
+  body[data-size="m"] .stat span { font-size: 15px; }
+  body[data-size="m"] .run { font-size: 12.5px; }
+  body[data-size="m"] #links:not(.compact) { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  body[data-size="m"] #links:not(.compact) .section { grid-column: 1 / -1; margin-bottom: 0; }
+  body[data-size="m"] #links:not(.compact) .link { margin: 0; }
+  body[data-size="m"] #links.compact { grid-template-columns: repeat(5, 1fr); }
+
+  /* Large: two panels. Character and best keys on the left, lookup and links on the right */
+  body[data-size="l"] { width: 620px; padding: 18px; font-size: 14px; }
+  body[data-size="l"] .crest { width: 46px; height: 46px; font-size: 19px; }
+  body[data-size="l"] header { grid-template-columns: 46px 1fr auto; margin-bottom: 14px; }
+  body[data-size="l"] .who h1 { font-size: 19px; }
+  body[data-size="l"] .who p, body[data-size="l"] #guildLine { font-size: 12.5px; }
+  body[data-size="l"] .cols { display: grid; grid-template-columns: 250px 1fr; gap: 18px; align-items: start; }
+  body[data-size="l"] .side, body[data-size="l"] .main { display: block; min-width: 0; }
+  /* Without stats (setup, options) the right panel takes the full width */
+  body[data-size="l"] .cols:not(:has(.side > :not([hidden]))) { grid-template-columns: 1fr; }
+  body[data-size="l"] .cols:not(:has(.side > :not([hidden]))) .side { display: none; }
+  body[data-size="l"] .stats { margin-top: 0; }
+  body[data-size="l"] .stat span { font-size: 16px; }
+  body[data-size="l"] .stat i { display: none; }
+  body[data-size="l"] button.stat { cursor: default; }
+  body[data-size="l"] .runs { margin-top: -4px; }
+  body[data-size="l"] .runs-grid { grid-template-columns: 1fr; gap: 4px; }
+  body[data-size="l"] .run { font-size: 13px; grid-template-columns: 1fr 62px 34px; gap: 6px; }
+  body[data-size="l"] .run .d { font-size: 12.5px; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body[data-size="l"] .run .ab { display: none; }
+  body[data-size="l"] .run .full { display: inline; }
+  body[data-size="l"] .run .sc { text-align: right; }
+  body[data-size="l"] .main .section:first-child { margin-top: 0; }
+  body[data-size="l"] #links.compact { grid-template-columns: repeat(4, 1fr); }
+  body[data-size="l"] .styles button b { font-size: 19px; }
+  /* Large options: groups flow in two columns */
+  body[data-size="l"] #settings { column-count: 2; column-gap: 22px; }
+  body[data-size="l"] .gbox { break-inside: avoid; display: inline-block; width: 100%; margin-bottom: 18px; }
+  body[data-size="l"] .gbox .group { margin-top: 0; padding-top: 0; border-top: 0; }
+  body[data-size="l"] #settings .primary, body[data-size="l"] #settings .secondary { column-span: all; }
   /* Themes: each one only redefines the palette */
   body[data-theme="arcane"] {
     --bg: #110f1a; --panel: #1a1726; --panel-2: #231f33; --line: #2e2940; --line-2: #403957;
@@ -76,6 +120,7 @@
   .runs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 14px; }
   .run { display: grid; grid-template-columns: 34px 1fr auto; align-items: baseline; font-size: 11.5px; }
   .run .d { color: var(--muted); font-weight: 600; font-size: 10.5px; }
+  .run .full { display: none; }
   .run .lvl { font-weight: 600; }
   .run .lvl i { font-style: normal; color: var(--accent); font-size: 9px; margin-left: 2px; }
   .run .muted { color: var(--faint); }
@@ -194,7 +239,7 @@
     margin: 20px 0 0; padding-top: 14px; border-top: 1px solid var(--line);
     font-size: 14px; font-weight: 700; color: var(--accent); letter-spacing: .01em;
   }
-  #settings .group:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+  #settings .gbox:first-child .group { margin-top: 0; padding-top: 0; border-top: 0; }
   .group-sub { margin: 1px 0 0; font-size: 11.5px; color: var(--muted); }
   .group-sub + .section { margin-top: 10px; }
   .styles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
@@ -385,14 +430,18 @@
   </div>
   <p id="guildLine" hidden></p>
 </header>
+<div class="cols">
+<div class="side">
+<div class="stats" id="stats" hidden></div>
+<div class="runs" id="runs" hidden></div>
+</div>
+<div class="main">
 <div class="lookup" id="lookup" hidden>
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
   <input id="lookupInput" data-i18n-ph="lookupPh" autocomplete="off" spellcheck="false">
   <p class="lookup-error" id="lookupError" hidden></p>
   <div class="recent" id="recent" hidden></div>
 </div>
-<div class="stats" id="stats" hidden></div>
-<div class="runs" id="runs" hidden></div>
 
 <!-- View: character setup -->
 <div id="config" hidden>
@@ -424,6 +473,7 @@
 <!-- View: options -->
 <div id="settings" hidden>
   <!-- General -->
+  <section class="gbox">
   <h2 class="group" data-i18n="gGeneral"></h2>
   <p class="group-sub" data-i18n="gGeneralSub"></p>
   <div class="section" data-i18n="language"></div>
@@ -438,8 +488,10 @@
     <label class="opt"><span class="txt" data-i18n="shortcuts"></span>
       <span class="switch"><input type="checkbox" id="shortcuts"><span></span></span></label>
   </div>
+  </section>
 
   <!-- Appearance -->
+  <section class="gbox">
   <h2 class="group" data-i18n="gLook"></h2>
   <p class="group-sub" data-i18n="gLookSub"></p>
   <div class="section" data-i18n="size"></div>
@@ -468,17 +520,23 @@
     <label class="opt"><span class="txt" data-i18n="faction"></span>
       <span class="switch"><input type="checkbox" id="faction"><span></span></span></label>
   </div>
+  </section>
 
   <!-- Links -->
+  <section class="gbox">
   <h2 class="group" data-i18n="gLinks"></h2>
   <p class="group-sub" data-i18n="gLinksSub"></p>
   <div class="section" data-i18n="charLinks"></div>
   <div class="opts" id="charOpts"></div>
   <div class="section" data-i18n="guildLinks"></div>
   <div class="opts" id="guildOpts"></div>
+  </section>
 
   <button class="primary" id="done" data-i18n="done"></button>
   <button class="secondary" id="reset" data-i18n="reset"></button>
+</div>
+
+</div>
 </div>
 
 <footer>
