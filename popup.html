@@ -98,6 +98,38 @@
   }
   .crest.avatar { color: transparent; background-position: center; background-size: cover; }
   .who { flex: 1; min-width: 0; }
+  /* Character switcher */
+  header { position: relative; }
+  .name-row { display: flex; align-items: center; gap: 4px; min-width: 0; }
+  .alt-caret { flex: none; font-size: 11px; color: var(--muted); transition: transform .2s, color .15s; }
+  .who.switchable { cursor: pointer; border-radius: 6px; }
+  .who.switchable:hover .alt-caret, .who.open .alt-caret { color: var(--accent); }
+  .who.open .alt-caret { transform: rotate(180deg); }
+  .alt-menu {
+    position: absolute; z-index: 20; top: calc(100% - 4px); left: 0; right: 0; padding: 4px;
+    background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 8px; box-shadow: 0 10px 28px #000a;
+  }
+  .alt-item {
+    display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 8px; width: 100%; padding: 6px;
+    font: inherit; color: var(--text); background: none; border: 0; border-radius: 6px; cursor: pointer; text-align: left;
+  }
+  .alt-item:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .alt-item.on { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+  .alt-dot {
+    width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700;
+    color: var(--on-accent); background: var(--accent) center / cover; box-shadow: 0 0 0 2px var(--c, var(--line-2));
+  }
+  .alt-dot.avatar { color: transparent; }
+  .alt-name { min-width: 0; }
+  .alt-name b { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .alt-name small { display: block; font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .alt-score { font-size: 12px; font-weight: 600; }
+  .alt-add { display: block; width: 100%; margin-top: 2px; padding: 7px 6px; font: inherit; font-size: 12.5px; color: var(--accent);
+             background: none; border: 0; border-top: 1px solid var(--line); border-radius: 0 0 6px 6px; cursor: pointer; text-align: left; }
+  .alt-add:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .config-title { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--accent); }
+  .config-title:empty { display: none; }
+  .secondary.danger:hover { color: #ff8a80; border-color: #ff8a8066; }
   .who h1 {
     margin: 0; font-size: 15px; font-weight: 600; color: var(--accent);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -410,8 +442,8 @@
 
 <header>
   <div class="crest" id="crest">N</div>
-  <div class="who">
-    <h1 id="title">Nezvi WoW</h1>
+  <div class="who" id="who">
+    <div class="name-row"><h1 id="title">Nezvi WoW</h1><span class="alt-caret" id="altCaret" hidden>▾</span></div>
     <p id="subtitle"></p>
   </div>
   <div class="tools">
@@ -429,6 +461,7 @@
     </button>
   </div>
   <p id="guildLine" hidden></p>
+  <div class="alt-menu" id="altMenu" hidden></div>
 </header>
 <div class="cols">
 <div class="side">
@@ -445,6 +478,7 @@
 
 <!-- View: character setup -->
 <div id="config" hidden>
+  <h2 class="config-title" id="configTitle"></h2>
   <div class="row">
     <div>
       <label for="region" data-i18n="region"></label>
@@ -461,7 +495,8 @@
   <label for="name" data-i18n="name"></label>
   <input id="name" data-i18n-ph="namePh">
   <button class="primary" id="save" data-i18n="save"></button>
-  <button class="secondary" id="removeChar" data-i18n="removeChar" hidden></button>
+  <button class="secondary" id="cancelChar" data-i18n="cancel" hidden></button>
+  <button class="secondary danger" id="removeChar" data-i18n="removeChar" hidden></button>
   <p class="error" id="error"></p>
 </div>
 

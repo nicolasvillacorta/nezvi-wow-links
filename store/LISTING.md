@@ -46,6 +46,7 @@ FEATURES
 • Automatic guild detection: your guild is looked up on Raider.io, including guilds on connected realms.
 • Guild links to Raider.io and Warcraft Logs (WoWProgress and the Armory are optional).
 • Your in-game avatar and class color in the popup.
+• Save all your alts and switch between them in one click (or with the arrow keys).
 • Your Mythic+ score, item level and current raid progress at a glance.
 • Realm autocomplete while you set up your character.
 • Player lookup: paste Name-Realm copied in game and Raider.io opens instantly, with your recent searches one click away.
@@ -80,6 +81,7 @@ FUNCIONES
 • Detección automática de la guild desde Raider.io, incluso en reinos conectados.
 • Links de la guild a Raider.io y Warcraft Logs (WoWProgress y la Armería son opcionales).
 • El avatar y el color de clase de tu personaje en el popup.
+• Guardá todos tus alters y cambiá entre ellos con un clic (o con las flechas del teclado).
 • Tu puntaje de Mítica+, nivel de objeto y progreso en la raid actual de un vistazo.
 • Autocompletado de reinos al configurar tu personaje.
 • Buscador de jugadores: pegá Nombre-Reino copiado del juego y se abre su Raider.io al instante, con tus búsquedas recientes a un clic.

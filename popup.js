@@ -19,6 +19,8 @@ const T = {
   es: {
     setup: "Configurá tu personaje", region: "Región", realm: "Reino", realmPh: "ej: Ragnaros",
     name: "Personaje", namePh: "Nombre", guild: "Guild", removeChar: "Quitar personaje",
+    cancel: "Cancelar", addChar: "+ Agregar personaje", newChar: "Nuevo personaje", editChar: "Editar personaje",
+    switchChar: "Cambiar de personaje (← →)",
     save: "Guardar", error: "Completá el reino y el personaje.",
     language: "Idioma", charLinks: "Links del personaje", guildLinks: "Links de la guild",
     prefs: "Preferencias", background: "Abrir links en segundo plano", shortcuts: "Mostrar atajos de teclado",
@@ -43,6 +45,8 @@ const T = {
   en: {
     setup: "Set up your character", region: "Region", realm: "Realm", realmPh: "e.g. Ragnaros",
     name: "Character", namePh: "Name", guild: "Guild", removeChar: "Remove character",
+    cancel: "Cancel", addChar: "+ Add character", newChar: "New character", editChar: "Edit character",
+    switchChar: "Switch character (← →)",
     save: "Save", error: "Enter a realm and a character.",
     language: "Language", charLinks: "Character links", guildLinks: "Guild links",
     prefs: "Preferences", background: "Open links in background", shortcuts: "Show keyboard shortcuts",
@@ -114,8 +118,12 @@ const defaults = () => ({
 });
 
 let settings = defaults();
-let char = null;
-let profile = null; // Raider.io data for char, see fetchProfile in raiderio.js
+// Saved characters (alts) and the one being shown
+let chars = [];
+let active = 0;
+let char = null;      // chars[active]
+let profiles = {};    // Raider.io data per character key, see fetchProfile in raiderio.js
+let editIndex = -1;   // Character being edited in the setup view; -1 adds a new one
 let view = "config"; // config | links | settings
 let prevView = "config";
 const t = () => T[settings.lang];
@@ -145,7 +153,14 @@ function show(v) {
   renderHeader();
   if (v === "links") renderLinks();
   if (v === "settings") renderSettings();
-  if (v === "config") { $("hint").textContent = VERSION; $("removeChar").hidden = !char; $("realm").focus(); }
+  if (v === "config") {
+    $("hint").textContent = VERSION;
+    $("configTitle").textContent = !chars.length ? "" : editIndex < 0 ? t().newChar : t().editChar;
+    $("removeChar").hidden = editIndex < 0;
+    $("cancelChar").hidden = !chars.length;
+    $("realm").focus();
+  }
+  closeAltMenu();
   // The lookup box stays folded behind the magnifier button
   $("searchBtn").hidden = v === "settings";
   if (v === "settings") toggleLookup(false);
@@ -155,7 +170,7 @@ function show(v) {
 }
 
 // ---------- Raider.io profile ----------
-const currentProfile = () => profile && char && profile.key === charKey(char) ? profile : null;
+const currentProfile = () => char ? profiles[charKey(char)] || null : null;
 
 // Guild as reported by Raider.io (it may be on another realm of the connected group)
 function guildOf() {
@@ -163,13 +178,61 @@ function guildOf() {
   return p && p.guild ? { name: p.guild, realm: p.guildRealm } : null;
 }
 
-async function refreshProfile() {
-  if (!char) return;
-  const p = await fetchProfile(char);
-  if (!p || !char || p.key !== charKey(char)) return;
-  profile = p;
-  chrome.storage.local.set({ profile });
-  if (view !== "config") show(view);
+async function refreshProfile(c = char) {
+  if (!c) return;
+  const p = await fetchProfile(c);
+  if (!p) return;
+  profiles[p.key] = { ...p, fetched: Date.now() };
+  await chrome.storage.local.set({ profiles });
+  if (char && p.key === charKey(char) && view !== "config") show(view);
+  if (!$("altMenu").hidden) renderAltMenu();
+}
+
+// ---------- Characters (alts) ----------
+const saveChars = () => chrome.storage.sync.set({ chars, active });
+
+function setActive(i) {
+  active = (i + chars.length) % chars.length;
+  char = chars[active];
+  saveChars();
+  show("links");
+  refreshProfile();
+}
+
+function renderAltMenu() {
+  const item = (c, i) => {
+    const p = profiles[charKey(c)] || {};
+    const color = CLASS_COLORS[p.cls] || "";
+    const dot = p.thumb
+      ? `<span class="alt-dot avatar" style="background-image:url('${p.thumb}');${color ? `--c:${color}` : ""}"></span>`
+      : `<span class="alt-dot" style="${color ? `--c:${color}` : ""}">${esc(c.name.trim()[0].toUpperCase())}</span>`;
+    return `<button class="alt-item${i === active ? " on" : ""}" data-i="${i}">${dot}
+      <span class="alt-name"><b style="${color ? `color:${color}` : ""}">${esc(c.name)}</b><small>${esc(c.realm)} · ${c.region.toUpperCase()}</small></span>
+      <span class="alt-score" style="${p.scoreColor ? `color:${p.scoreColor}` : ""}">${p.score || ""}</span></button>`;
+  };
+  $("altMenu").innerHTML = chars.map(item).join("") + `<button class="alt-add" id="addChar">${t().addChar}</button>`;
+}
+
+function openAltMenu() {
+  renderAltMenu();
+  $("altMenu").hidden = false;
+  $("who").classList.add("open");
+  // Fill in alts never loaded or loaded more than 15 minutes ago
+  chars.filter(c => !profiles[charKey(c)] || Date.now() - (profiles[charKey(c)].fetched || 0) > 15 * 60 * 1000)
+    .forEach(c => refreshProfile(c));
+}
+
+function closeAltMenu() {
+  $("altMenu").hidden = true;
+  $("who").classList.remove("open");
+}
+
+function startCharForm(index) {
+  editIndex = index;
+  const c = chars[index] || { region: char ? char.region : "us", realm: "", name: "" };
+  ["region", "realm", "name"].forEach(k => $(k).value = c[k]);
+  $("error").textContent = "";
+  show("config");
 }
 
 // ---------- Header ----------
@@ -180,6 +243,9 @@ function renderHeader() {
   $("guildLine").hidden = true;
   $("stats").innerHTML = $("runs").innerHTML = "";
   document.body.dataset.faction = "";
+  $("who").classList.toggle("switchable", !!char);
+  $("altCaret").hidden = !char;
+  $("who").title = char ? t().switchChar : "";
   if (!char) {
     crest.textContent = "N"; $("title").textContent = "Nezvi WoW"; $("subtitle").textContent = t().setup;
     return;
@@ -308,7 +374,22 @@ $("settings").addEventListener("change", e => {
   saveSettings();
 });
 
-$("edit").onclick = () => show("config");
+$("edit").onclick = () => startCharForm(active);
+$("cancelChar").onclick = () => show(char ? "links" : "config");
+
+$("who").addEventListener("click", () => {
+  if (!char || view === "settings") return;
+  $("altMenu").hidden ? openAltMenu() : closeAltMenu();
+});
+$("altMenu").addEventListener("click", e => {
+  e.stopPropagation();
+  if (e.target.closest("#addChar")) return startCharForm(-1);
+  const item = e.target.closest(".alt-item");
+  if (item) setActive(Number(item.dataset.i));
+});
+document.addEventListener("click", e => {
+  if (!$("altMenu").hidden && !e.target.closest("#altMenu") && !e.target.closest("#who")) closeAltMenu();
+});
 
 // The M+ chip expands the best keys panel; the choice is remembered
 $("stats").addEventListener("click", e => {
@@ -331,13 +412,17 @@ $("links").addEventListener("click", e => {
   e.preventDefault(); open(a.href);
 });
 
-// Forget the character and go back to an empty setup
+// Forget the character being edited; show the next one, or an empty setup if none is left
 $("removeChar").onclick = async () => {
-  await chrome.storage.sync.remove("char");
-  await chrome.storage.local.remove("profile");
-  char = profile = null;
-  $("realm").value = $("name").value = "";
-  show("config");
+  const [gone] = chars.splice(editIndex, 1);
+  delete profiles[charKey(gone)];
+  await chrome.storage.local.set({ profiles });
+  active = Math.min(active, chars.length - 1);
+  if (active < 0) active = 0;
+  char = chars[active] || null;
+  await saveChars();
+  if (char) show("links");
+  else startCharForm(-1);
 };
 
 $("save").onclick = () => {
@@ -346,7 +431,12 @@ $("save").onclick = () => {
   const official = (REALMS[c.region] || []).find(r => realmKey(r) === realmKey(c.realm));
   if (official) c.realm = $("realm").value = official;
   $("error").textContent = "";
-  chrome.storage.sync.set({ char: c }, () => { char = c; show("links"); refreshProfile(); });
+  // Already saved: just switch to it
+  const existing = chars.findIndex(x => charKey(x) === charKey(c));
+  if (existing >= 0 && existing !== editIndex) return setActive(existing);
+  if (editIndex >= 0) { chars[editIndex] = c; active = editIndex; }
+  else { chars.push(c); active = chars.length - 1; }
+  setActive(active);
 };
 
 // Realm suggestions while typing, filtered by the selected region.
@@ -481,6 +571,14 @@ document.addEventListener("paste", e => {
   lookup();
 });
 
+// ← → rotate through your characters
+document.addEventListener("keydown", e => {
+  if (view !== "links" || chars.length < 2 || e.target.tagName === "INPUT") return;
+  if (e.key === "ArrowRight") { e.preventDefault(); setActive(active + 1); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); setActive(active - 1); }
+  if (e.key === "Escape" && !$("altMenu").hidden) { e.preventDefault(); closeAltMenu(); }
+});
+
 // Shortcuts: keys 1–9 open the matching link
 document.addEventListener("keydown", e => {
   if (view !== "links" || !settings.shortcuts) return;
@@ -492,14 +590,27 @@ document.addEventListener("keydown", e => {
 
 // ---------- Startup ----------
 $("donate").href = DONATE_URL;
-chrome.storage.sync.get(["char", "settings"], async data => {
+chrome.storage.sync.get(["char", "chars", "active", "settings"], async data => {
   const d = defaults();
   // Merge with defaults so newly added sites show up with their default value
   settings = { ...d, ...data.settings, links: { ...d.links, ...(data.settings && data.settings.links) } };
-  char = data.char || null;
-  // Show the cached profile right away, then refresh it from Raider.io
-  ({ profile = null } = await chrome.storage.local.get("profile"));
-  if (char) ["region", "realm", "name"].forEach(k => $(k).value = char[k] || "");
+  chars = data.chars || [];
+  active = Math.min(data.active || 0, Math.max(chars.length - 1, 0));
+  // Show cached profiles right away, then refresh from Raider.io
+  const local = await chrome.storage.local.get(["profiles", "profile"]);
+  profiles = local.profiles || {};
+  // Versions up to 1.1 saved a single character and profile: move them into the lists
+  if (!data.chars && data.char) {
+    chars = [{ region: data.char.region, realm: data.char.realm, name: data.char.name }];
+    active = 0;
+    if (local.profile) profiles[local.profile.key] = local.profile;
+    await chrome.storage.sync.set({ chars, active });
+    await chrome.storage.sync.remove("char");
+    await chrome.storage.local.set({ profiles });
+    await chrome.storage.local.remove("profile");
+  }
+  char = chars[active] || null;
+  if (!char) editIndex = -1;
   applyLook(settings);
   applyLang();
   show(char ? "links" : "config");

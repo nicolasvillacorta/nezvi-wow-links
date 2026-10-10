@@ -7,6 +7,7 @@ A browser extension (Chrome, Edge and other Chromium browsers) for **World of Wa
 - **Character links:** Raider.io, Warcraft Logs, Armory and WoWProgress are enabled on install. Simple Armory and Data for Azeroth can be turned on in the options.
 - **Automatic guild detection:** the guild is looked up on Raider.io from your character, so you don't need to type it. Guild links use the guild's own realm, which works with connected realms.
 - **Guild links:** Raider.io and Warcraft Logs are enabled by default (WoWProgress and the Armory are optional).
+- **Multiple characters (alts):** click your name to open the switcher, with each alt's class color, realm and M+ score. Add, edit or remove characters, and rotate between them with `←` `→`.
 - **Character card:** shows your in-game avatar and class color, fetched from Raider.io.
 - **Stats at a glance:** your current Mythic+ score (in Raider.io's score color), equipped item level, progress in the current raid, right in the popup.
 - **Best keys:** click the M+ chip to see your best key per dungeon this season and how far you are from the season title.

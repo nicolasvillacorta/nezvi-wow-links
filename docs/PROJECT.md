@@ -19,7 +19,8 @@ Internal documentation: what the extension does, how it's built, why things are 
 - Header with the in-game avatar, class color, realm and guild.
 - Stats: Mythic+ score (in Raider.io's score color), equipped item level and current raid progress.
 - Best keys panel (click the M+ chip): best key per season dungeon with upgrades, plus the distance to the season title cutoff (top 0.1% of the region).
-- Remove character, to leave the extension without one.
+- Multiple characters (alts): switcher on the name with class color, realm and score; add, edit and remove; `←` `→` rotate.
+- Remove character; with none left the extension goes back to an empty setup.
 
 **Links**
 - Character: Raider.io, Warcraft Logs, Armory and WoWProgress on by default; Simple Armory and Data for Azeroth optional.
@@ -90,9 +91,9 @@ Sites disagree on realm slugs, so `raiderio.js` has two:
 
 | Key | Area | Content |
 | --- | --- | --- |
-| `char` | sync | `{ region, realm, name }` |
+| `chars`, `active` | sync | List of `{ region, realm, name }` and the index shown. Up to 1.1 a single `char` was saved; it's migrated on first open. |
 | `settings` | sync | `lang, links{}, background, shortcuts, compact, theme, style, size, faction, runsOpen`. Merged with defaults on load, so new options and sites get their default value. |
-| `profile` | local | Last Raider.io profile, keyed by `region/realm/name` |
+| `profiles` | local | Raider.io profile per character key (`region/realm/name`), with a `fetched` time. Alts older than 15 minutes refresh when the switcher opens. |
 | `recent` | local | Last 5 player lookups |
 | `raidCache`, `mplusCache`, `cutoff:*` | local | API caches |
 | `look` | `localStorage` | Copy of theme, style and size, read synchronously so the popup doesn't flash the defaults on open |
@@ -158,4 +159,4 @@ Manual check before a release: load it unpacked, set up a character, open each l
 - Right-click "View on Raider.io" for selected `Name-Realm` text.
 - Highlight the dungeon with the lowest score in the best keys panel.
 - Guides for the character's spec (Wowhead, Icy Veins, Murlok).
-- Weekly affixes, multiple characters (alts), Firefox version, automatic store publishing with a GitHub Action.
+- Weekly affixes, Firefox version, automatic store publishing with a GitHub Action.
