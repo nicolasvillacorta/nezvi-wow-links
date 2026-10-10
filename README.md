@@ -91,6 +91,8 @@ If you cloned the repository with Git, run `git pull` instead of downloading the
 
 To add a new site, add an entry to the `SITES` list in `popup.js`.
 
+Project notes (architecture, design decisions, release process, changelog) are in [`docs/PROJECT.md`](docs/PROJECT.md).
+
 Store listing texts and images live in [`store/`](store/LISTING.md).
 
 ## Privacy
