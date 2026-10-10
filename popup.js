@@ -5,12 +5,17 @@ const $ = id => document.getElementById(id);
 const DONATE_URL = "https://cafecito.app/nezvi";
 const VERSION = "v" + chrome.runtime.getManifest().version;
 
-// Theme from a local copy first, so the popup doesn't flash the default colors while settings load
-function applyTheme(theme) {
+// Look (style + color) from a local copy first, so the popup doesn't flash the defaults while settings load
+function applyTheme(theme, style) {
   document.body.dataset.theme = theme;
-  try { localStorage.setItem("theme", theme); } catch {}
+  document.body.dataset.style = style;
+  try { localStorage.setItem("look", JSON.stringify({ theme, style })); } catch {}
 }
-try { document.body.dataset.theme = localStorage.getItem("theme") || "gold"; } catch {}
+try {
+  const look = JSON.parse(localStorage.getItem("look") || "{}");
+  document.body.dataset.theme = look.theme || "gold";
+  document.body.dataset.style = look.style || "modern";
+} catch {}
 
 const T = {
   es: {
@@ -21,7 +26,8 @@ const T = {
     prefs: "Preferencias", background: "Abrir links en segundo plano", shortcuts: "Mostrar atajos de teclado",
     score: "Puntaje Mítica+", ilvl: "Nivel de objeto equipado", raid: "Progreso en la raid actual",
     compact: "Modo compacto", faction: "Colores de facción",
-    theme: "Tema", themeGold: "Oro", themeArcane: "Arcano", themeFrost: "Escarcha", themeFel: "Vil", runs: "Ver mejores llaves",
+    style: "Estilo", styleModern: "Moderno", styleClassic: "Clásico", styleMinimal: "Minimal",
+    theme: "Color", themeGold: "Oro", themeArcane: "Arcano", themeFrost: "Escarcha", themeFel: "Vil", runs: "Ver mejores llaves",
     titleCut: "Título (top 0,1%)", titleLeft: n => `te faltan ${n}`, titleIn: "¡en rango!",
     depleted: "Fuera de tiempo", notDone: "Sin completar",
     done: "Listo", reset: "Restablecer opciones", donate: "Invitame un café", settings: "Opciones",
@@ -40,7 +46,8 @@ const T = {
     prefs: "Preferences", background: "Open links in background", shortcuts: "Show keyboard shortcuts",
     score: "Mythic+ score", ilvl: "Equipped item level", raid: "Current raid progress",
     compact: "Compact mode", faction: "Faction colors",
-    theme: "Theme", themeGold: "Gold", themeArcane: "Arcane", themeFrost: "Frost", themeFel: "Fel", runs: "Show best keys",
+    style: "Style", styleModern: "Modern", styleClassic: "Classic", styleMinimal: "Minimal",
+    theme: "Color", themeGold: "Gold", themeArcane: "Arcane", themeFrost: "Frost", themeFel: "Fel", runs: "Show best keys",
     titleCut: "Title (top 0.1%)", titleLeft: n => `${n} to go`, titleIn: "in range!",
     depleted: "Over time", notDone: "Not completed",
     done: "Done", reset: "Reset options", donate: "Buy me a coffee", settings: "Options",
@@ -94,6 +101,7 @@ const defaults = () => ({
   shortcuts: true,
   compact: false,
   theme: "gold",
+  style: "modern",
   faction: true,
   runsOpen: false,
 });
@@ -115,6 +123,7 @@ function applyLang() {
   $("searchBtn").title = t().search; $("copy").title = t().copy; $("edit").title = t().edit; $("settingsBtn").title = t().settings;
   document.querySelectorAll("#lang button").forEach(b => b.classList.toggle("on", b.dataset.lang === settings.lang));
   document.querySelectorAll("#themes button").forEach(b => b.classList.toggle("on", b.dataset.theme === settings.theme));
+  document.querySelectorAll("#styles button").forEach(b => b.classList.toggle("on", b.dataset.style === settings.style));
 }
 
 // ---------- Views ----------
@@ -221,7 +230,7 @@ function renderLinks() {
   const sites = visibleSites();
   const item = (s, i) =>
     `<a class="link" href="${s.url(c)}" target="_blank" title="${siteName(s)}">
-       <span class="tag" style="background:${s.color}">${s.tag}</span>
+       <span class="tag" style="--c:${s.color}">${s.tag}</span>
        <span class="name">${siteName(s)}</span><kbd>${i + 1}</kbd>
      </a>`;
   const char_ = sites.filter(s => s.scope === "char"), guild = sites.filter(s => s.scope === "guild");
@@ -239,7 +248,7 @@ function renderLinks() {
 
 function renderSettings() {
   const row = s => `<label class="opt">
-      <span class="tag" style="background:${s.color}">${s.tag}</span>
+      <span class="tag" style="--c:${s.color}">${s.tag}</span>
       <span class="txt">${siteName(s)}</span>
       <span class="switch"><input type="checkbox" data-site="${s.id}" ${settings.links[s.id] ? "checked" : ""}><span></span></span>
     </label>`;
@@ -261,7 +270,7 @@ $("settingsBtn").onclick = () => {
   else { prevView = view; show("settings"); }
 };
 $("done").onclick = () => show(prevView);
-$("reset").onclick = () => { settings = defaults(); saveSettings(); applyTheme(settings.theme); applyLang(); show("settings"); };
+$("reset").onclick = () => { settings = defaults(); saveSettings(); applyTheme(settings.theme, settings.style); applyLang(); show("settings"); };
 
 $("lang").onclick = e => {
   const lang = e.target.dataset.lang;
@@ -271,7 +280,12 @@ $("lang").onclick = e => {
 $("themes").onclick = e => {
   const b = e.target.closest("button");
   if (!b) return;
-  settings.theme = b.dataset.theme; saveSettings(); applyTheme(settings.theme); applyLang();
+  settings.theme = b.dataset.theme; saveSettings(); applyTheme(settings.theme, settings.style); applyLang();
+};
+$("styles").onclick = e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  settings.style = b.dataset.style; saveSettings(); applyTheme(settings.theme, settings.style); applyLang();
 };
 $("settings").addEventListener("change", e => {
   const el = e.target;
@@ -472,7 +486,7 @@ chrome.storage.sync.get(["char", "settings"], async data => {
   // Show the cached profile right away, then refresh it from Raider.io
   ({ profile = null } = await chrome.storage.local.get("profile"));
   if (char) ["region", "realm", "name"].forEach(k => $(k).value = char[k] || "");
-  applyTheme(settings.theme);
+  applyTheme(settings.theme, settings.style);
   applyLang();
   show(char ? "links" : "config");
   refreshProfile();

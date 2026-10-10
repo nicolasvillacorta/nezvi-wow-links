@@ -156,7 +156,7 @@
   .link:hover { background: var(--panel-2); border-color: var(--line-2); transform: translateX(2px); }
   .tag {
     flex: none; width: 34px; padding: 3px 0; border-radius: 5px; text-align: center;
-    font-size: 10px; font-weight: 700; color: #fff;
+    font-size: 10px; font-weight: 700; color: #fff; background: var(--c);
   }
   .link .name { flex: 1; }
   .link kbd {
@@ -185,6 +185,14 @@
   }
   .seg button:hover { color: var(--text); }
   .seg button.on { color: var(--on-accent); font-weight: 600; background: linear-gradient(180deg, var(--accent), var(--accent-2)); }
+  .styles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  .styles button {
+    display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 2px 6px; cursor: pointer;
+    font: inherit; font-size: 11px; color: var(--muted); background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  }
+  .styles button b { font-size: 17px; color: var(--text); }
+  .styles button:hover { color: var(--text); border-color: var(--line-2); }
+  .styles button.on { color: var(--text); border-color: var(--accent-2); }
   .themes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
   .themes button {
     display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 2px 6px; cursor: pointer;
@@ -230,6 +238,116 @@
   }
   .donate:hover { background: color-mix(in srgb, var(--accent) 15%, transparent); border-color: var(--accent); }
   .donate .heart { color: #ff6b6b; }
+
+  /* ===== Style: Classic (in-game UI look) ===== */
+  body[data-style="classic"] {
+    font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    background:
+      radial-gradient(120% 70% at 50% 0%, var(--glow) 0%, transparent 65%),
+      radial-gradient(140% 100% at 50% 50%, transparent 55%, #0008 100%),
+      var(--bg);
+    /* Double gold frame around the whole popup */
+    box-shadow: inset 0 0 0 1px var(--accent-2), inset 0 0 0 3px #000, inset 0 0 0 4px color-mix(in srgb, var(--accent-2) 55%, transparent);
+    padding: 16px;
+  }
+  body[data-style="classic"] .who h1 { font-size: 17px; letter-spacing: .01em; text-shadow: 0 1px 0 #000, 0 0 8px #0008; }
+  body[data-style="classic"] .crest {
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px #000, 0 0 0 2px var(--accent-2), 0 0 0 3px #000, 0 3px 8px #000a;
+  }
+  body[data-style="classic"] .section {
+    display: flex; align-items: center; gap: 8px; justify-content: center;
+    font-variant: small-caps; text-transform: none; font-size: 13px; letter-spacing: .1em; color: var(--accent);
+  }
+  body[data-style="classic"] .section::before,
+  body[data-style="classic"] .section::after {
+    content: ""; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-2));
+  }
+  body[data-style="classic"] .section::after { background: linear-gradient(90deg, var(--accent-2), transparent); }
+  body[data-style="classic"] .link,
+  body[data-style="classic"] .stat,
+  body[data-style="classic"] .runs,
+  body[data-style="classic"] .recent,
+  body[data-style="classic"] .opts,
+  body[data-style="classic"] .themes button,
+  body[data-style="classic"] .styles button,
+  body[data-style="classic"] input,
+  body[data-style="classic"] select,
+  body[data-style="classic"] .icon,
+  body[data-style="classic"] .seg {
+    border-radius: 2px;
+    border-color: color-mix(in srgb, var(--accent-2) 45%, #000);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--panel-2) 80%, #000), color-mix(in srgb, var(--panel) 70%, #000));
+  }
+  body[data-style="classic"] .link:hover { transform: none; border-color: var(--accent-2); box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 25%, transparent); }
+  body[data-style="classic"] .tag {
+    border-radius: 2px; border: 1px solid #000; font-family: system-ui, sans-serif;
+    box-shadow: inset 0 1px 0 #fff5, inset 0 -2px 0 #0006;
+  }
+  body[data-style="classic"] .stat span,
+  body[data-style="classic"] .link .name { font-size: 14px; }
+  body[data-style="classic"] .stat b { font-variant: small-caps; text-transform: none; font-size: 11.5px; letter-spacing: .06em; }
+  body[data-style="classic"] kbd { border-radius: 2px; }
+  /* Red buttons with gold trim, like the game's */
+  body[data-style="classic"] .primary,
+  body[data-style="classic"] .seg button.on {
+    border-radius: 3px; color: #ffd76a; text-shadow: 0 1px 0 #000;
+    background: linear-gradient(180deg, #b52a1c 0%, #7c1209 55%, #5a0c06 100%);
+    border: 1px solid #e0b25a; box-shadow: inset 0 1px 0 #ff8a6a66, 0 0 0 1px #000;
+  }
+  body[data-style="classic"] .primary:hover { filter: brightness(1.15); }
+  body[data-style="classic"] .secondary { border-radius: 3px; border-color: color-mix(in srgb, var(--accent-2) 45%, #000); }
+  body[data-style="classic"] .donate { border-radius: 3px; }
+  body[data-style="classic"] footer { border-top-color: color-mix(in srgb, var(--accent-2) 50%, transparent); }
+
+  /* ===== Style: Minimal (flat list, no cards) ===== */
+  body[data-style="minimal"] { background: var(--bg); font-size: 12.5px; }
+  body[data-style="minimal"] .crest { width: 30px; height: 30px; font-size: 13px; box-shadow: none; }
+  body[data-style="minimal"] header { grid-template-columns: 30px 1fr auto; }
+  body[data-style="minimal"] .who h1 { font-size: 14px; }
+  body[data-style="minimal"] .icon { border-color: transparent; }
+  body[data-style="minimal"] .icon:hover { background: var(--panel); }
+  body[data-style="minimal"] .stats {
+    gap: 0; margin: 0 0 10px; padding: 6px 0;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  }
+  body[data-style="minimal"] .stat {
+    flex-direction: row; justify-content: center; gap: 5px; padding: 2px 4px;
+    background: none; border: 0; border-radius: 0;
+  }
+  body[data-style="minimal"] .stat + .stat { border-left: 1px solid var(--line); }
+  body[data-style="minimal"] .stat b { font-size: 10px; }
+  body[data-style="minimal"] .stat span { font-size: 12.5px; }
+  body[data-style="minimal"] button.stat:hover { background: none; }
+  body[data-style="minimal"] .stat.open b { color: var(--accent); }
+  body[data-style="minimal"] .runs { margin: -4px 0 10px; padding: 6px 2px; background: none; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; }
+  body[data-style="minimal"] .section { text-transform: none; letter-spacing: 0; font-size: 11px; margin: 12px 4px 2px; }
+  body[data-style="minimal"] .link {
+    margin: 0; padding: 8px 4px; gap: 9px;
+    background: none; border: 0; border-bottom: 1px solid var(--line); border-radius: 0;
+  }
+  body[data-style="minimal"] .link:hover { background: var(--panel); transform: none; }
+  body[data-style="minimal"] .link:hover .name { color: var(--accent); }
+  /* Tags become colored outlines */
+  body[data-style="minimal"] .tag {
+    width: 30px; padding: 1px 0; font-size: 9px; background: none;
+    color: var(--c); box-shadow: inset 0 0 0 1px var(--c); border-radius: 4px;
+  }
+  body[data-style="minimal"] .link kbd { border: 0; padding: 0; }
+  body[data-style="minimal"] #links.compact .link { border: 1px solid var(--line); border-radius: 6px; }
+  body[data-style="minimal"] input,
+  body[data-style="minimal"] select { background: none; border-width: 0 0 1px; border-radius: 0; padding-left: 2px; }
+  body[data-style="minimal"] .lookup input { padding-left: 26px; }
+  body[data-style="minimal"] .lookup svg { left: 4px; }
+  body[data-style="minimal"] input:focus,
+  body[data-style="minimal"] select:focus { box-shadow: none; border-color: var(--accent); }
+  body[data-style="minimal"] .primary { background: var(--accent); border-radius: 6px; }
+  body[data-style="minimal"] .secondary { background: none; border-color: transparent; color: var(--muted); }
+  body[data-style="minimal"] .secondary:hover { color: var(--text); background: var(--panel); }
+  body[data-style="minimal"] .opts,
+  body[data-style="minimal"] .recent { background: none; border-radius: 0; border-width: 1px 0; }
+  body[data-style="minimal"] .donate { background: none; border-color: transparent; padding: 5px 2px; }
 </style>
 
 <header>
@@ -296,6 +414,12 @@
   <div class="seg" id="lang">
     <button data-lang="es">Español</button>
     <button data-lang="en">English</button>
+  </div>
+  <div class="section" data-i18n="style"></div>
+  <div class="styles" id="styles">
+    <button data-style="modern"><b>Aa</b><span data-i18n="styleModern"></span></button>
+    <button data-style="classic"><b style="font-family: 'Palatino Linotype', Georgia, serif">Aa</b><span data-i18n="styleClassic"></span></button>
+    <button data-style="minimal"><b style="font-weight: 400">Aa</b><span data-i18n="styleMinimal"></span></button>
   </div>
   <div class="section" data-i18n="theme"></div>
   <div class="themes" id="themes">
