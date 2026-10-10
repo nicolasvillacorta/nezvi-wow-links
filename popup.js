@@ -5,16 +5,14 @@ const $ = id => document.getElementById(id);
 const DONATE_URL = "https://cafecito.app/nezvi";
 const VERSION = "v" + chrome.runtime.getManifest().version;
 
-// Look (style + color) from a local copy first, so the popup doesn't flash the defaults while settings load
-function applyTheme(theme, style) {
-  document.body.dataset.theme = theme;
-  document.body.dataset.style = style;
-  try { localStorage.setItem("look", JSON.stringify({ theme, style })); } catch {}
+// Look (color, style and size) from a local copy first, so the popup doesn't flash or resize while settings load
+function applyLook({ theme, style, size }) {
+  Object.assign(document.body.dataset, { theme, style, size });
+  try { localStorage.setItem("look", JSON.stringify({ theme, style, size })); } catch {}
 }
 try {
   const look = JSON.parse(localStorage.getItem("look") || "{}");
-  document.body.dataset.theme = look.theme || "gold";
-  document.body.dataset.style = look.style || "modern";
+  Object.assign(document.body.dataset, { theme: look.theme || "gold", style: look.style || "modern", size: look.size || "s" });
 } catch {}
 
 const T = {
@@ -26,6 +24,10 @@ const T = {
     prefs: "Preferencias", background: "Abrir links en segundo plano", shortcuts: "Mostrar atajos de teclado",
     score: "Puntaje Mítica+", ilvl: "Nivel de objeto equipado", raid: "Progreso en la raid actual",
     compact: "Modo compacto", faction: "Colores de facción",
+    gGeneral: "General", gGeneralSub: "Idioma y comportamiento",
+    gLook: "Apariencia", gLookSub: "Cómo se ve la extensión",
+    gLinks: "Links", gLinksSub: "Qué sitios mostrar", display: "Visualización",
+    size: "Tamaño", sizeS: "Chico", sizeM: "Mediano", sizeL: "Grande",
     style: "Estilo", styleModern: "Moderno", styleClassic: "Clásico", styleMinimal: "Minimal",
     theme: "Color", themeGold: "Oro", themeArcane: "Arcano", themeFrost: "Escarcha", themeFel: "Vil", runs: "Ver mejores llaves",
     titleCut: "Título (top 0,1%)", titleLeft: n => `te faltan ${n}`, titleIn: "¡en rango!",
@@ -46,6 +48,10 @@ const T = {
     prefs: "Preferences", background: "Open links in background", shortcuts: "Show keyboard shortcuts",
     score: "Mythic+ score", ilvl: "Equipped item level", raid: "Current raid progress",
     compact: "Compact mode", faction: "Faction colors",
+    gGeneral: "General", gGeneralSub: "Language and behavior",
+    gLook: "Appearance", gLookSub: "How the extension looks",
+    gLinks: "Links", gLinksSub: "Which sites to show", display: "Display",
+    size: "Size", sizeS: "Small", sizeM: "Medium", sizeL: "Large",
     style: "Style", styleModern: "Modern", styleClassic: "Classic", styleMinimal: "Minimal",
     theme: "Color", themeGold: "Gold", themeArcane: "Arcane", themeFrost: "Frost", themeFel: "Fel", runs: "Show best keys",
     titleCut: "Title (top 0.1%)", titleLeft: n => `${n} to go`, titleIn: "in range!",
@@ -102,6 +108,7 @@ const defaults = () => ({
   compact: false,
   theme: "gold",
   style: "modern",
+  size: "s",
   faction: true,
   runsOpen: false,
 });
@@ -124,6 +131,7 @@ function applyLang() {
   document.querySelectorAll("#lang button").forEach(b => b.classList.toggle("on", b.dataset.lang === settings.lang));
   document.querySelectorAll("#themes button").forEach(b => b.classList.toggle("on", b.dataset.theme === settings.theme));
   document.querySelectorAll("#styles button").forEach(b => b.classList.toggle("on", b.dataset.style === settings.style));
+  document.querySelectorAll("#sizes button").forEach(b => b.classList.toggle("on", b.dataset.size === settings.size));
 }
 
 // ---------- Views ----------
@@ -270,7 +278,7 @@ $("settingsBtn").onclick = () => {
   else { prevView = view; show("settings"); }
 };
 $("done").onclick = () => show(prevView);
-$("reset").onclick = () => { settings = defaults(); saveSettings(); applyTheme(settings.theme, settings.style); applyLang(); show("settings"); };
+$("reset").onclick = () => { settings = defaults(); saveSettings(); applyLook(settings); applyLang(); show("settings"); };
 
 $("lang").onclick = e => {
   const lang = e.target.dataset.lang;
@@ -280,12 +288,17 @@ $("lang").onclick = e => {
 $("themes").onclick = e => {
   const b = e.target.closest("button");
   if (!b) return;
-  settings.theme = b.dataset.theme; saveSettings(); applyTheme(settings.theme, settings.style); applyLang();
+  settings.theme = b.dataset.theme; saveSettings(); applyLook(settings); applyLang();
 };
 $("styles").onclick = e => {
   const b = e.target.closest("button");
   if (!b) return;
-  settings.style = b.dataset.style; saveSettings(); applyTheme(settings.theme, settings.style); applyLang();
+  settings.style = b.dataset.style; saveSettings(); applyLook(settings); applyLang();
+};
+$("sizes").onclick = e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  settings.size = b.dataset.size; saveSettings(); applyLook(settings); applyLang();
 };
 $("settings").addEventListener("change", e => {
   const el = e.target;
@@ -486,7 +499,7 @@ chrome.storage.sync.get(["char", "settings"], async data => {
   // Show the cached profile right away, then refresh it from Raider.io
   ({ profile = null } = await chrome.storage.local.get("profile"));
   if (char) ["region", "realm", "name"].forEach(k => $(k).value = char[k] || "");
-  applyTheme(settings.theme, settings.style);
+  applyLook(settings);
   applyLang();
   show(char ? "links" : "config");
   refreshProfile();
