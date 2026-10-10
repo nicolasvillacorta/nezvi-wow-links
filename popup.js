@@ -5,6 +5,13 @@ const $ = id => document.getElementById(id);
 const DONATE_URL = "https://cafecito.app/nezvi";
 const VERSION = "v" + chrome.runtime.getManifest().version;
 
+// Theme from a local copy first, so the popup doesn't flash the default colors while settings load
+function applyTheme(theme) {
+  document.body.dataset.theme = theme;
+  try { localStorage.setItem("theme", theme); } catch {}
+}
+try { document.body.dataset.theme = localStorage.getItem("theme") || "gold"; } catch {}
+
 const T = {
   es: {
     setup: "Configurá tu personaje", region: "Región", realm: "Reino", realmPh: "ej: Ragnaros",
@@ -13,7 +20,8 @@ const T = {
     language: "Idioma", charLinks: "Links del personaje", guildLinks: "Links de la guild",
     prefs: "Preferencias", background: "Abrir links en segundo plano", shortcuts: "Mostrar atajos de teclado",
     score: "Puntaje Mítica+", ilvl: "Nivel de objeto equipado", raid: "Progreso en la raid actual",
-    compact: "Modo compacto", faction: "Colores de facción", runs: "Ver mejores llaves",
+    compact: "Modo compacto", faction: "Colores de facción",
+    theme: "Tema", themeGold: "Oro", themeArcane: "Arcano", themeFrost: "Escarcha", themeFel: "Vil", runs: "Ver mejores llaves",
     titleCut: "Título (top 0,1%)", titleLeft: n => `te faltan ${n}`, titleIn: "¡en rango!",
     depleted: "Fuera de tiempo", notDone: "Sin completar",
     done: "Listo", reset: "Restablecer opciones", donate: "Invitame un café", settings: "Opciones",
@@ -31,7 +39,8 @@ const T = {
     language: "Language", charLinks: "Character links", guildLinks: "Guild links",
     prefs: "Preferences", background: "Open links in background", shortcuts: "Show keyboard shortcuts",
     score: "Mythic+ score", ilvl: "Equipped item level", raid: "Current raid progress",
-    compact: "Compact mode", faction: "Faction colors", runs: "Show best keys",
+    compact: "Compact mode", faction: "Faction colors",
+    theme: "Theme", themeGold: "Gold", themeArcane: "Arcane", themeFrost: "Frost", themeFel: "Fel", runs: "Show best keys",
     titleCut: "Title (top 0.1%)", titleLeft: n => `${n} to go`, titleIn: "in range!",
     depleted: "Over time", notDone: "Not completed",
     done: "Done", reset: "Reset options", donate: "Buy me a coffee", settings: "Options",
@@ -84,6 +93,7 @@ const defaults = () => ({
   background: false,
   shortcuts: true,
   compact: false,
+  theme: "gold",
   faction: true,
   runsOpen: false,
 });
@@ -104,6 +114,7 @@ function applyLang() {
   document.querySelectorAll("[data-i18n-ph]").forEach(el => el.placeholder = t()[el.dataset.i18nPh]);
   $("searchBtn").title = t().search; $("copy").title = t().copy; $("edit").title = t().edit; $("settingsBtn").title = t().settings;
   document.querySelectorAll("#lang button").forEach(b => b.classList.toggle("on", b.dataset.lang === settings.lang));
+  document.querySelectorAll("#themes button").forEach(b => b.classList.toggle("on", b.dataset.theme === settings.theme));
 }
 
 // ---------- Views ----------
@@ -250,12 +261,17 @@ $("settingsBtn").onclick = () => {
   else { prevView = view; show("settings"); }
 };
 $("done").onclick = () => show(prevView);
-$("reset").onclick = () => { settings = defaults(); saveSettings(); applyLang(); show("settings"); };
+$("reset").onclick = () => { settings = defaults(); saveSettings(); applyTheme(settings.theme); applyLang(); show("settings"); };
 
 $("lang").onclick = e => {
   const lang = e.target.dataset.lang;
   if (!lang) return;
   settings.lang = lang; saveSettings(); applyLang(); renderHeader(); renderSettings();
+};
+$("themes").onclick = e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  settings.theme = b.dataset.theme; saveSettings(); applyTheme(settings.theme); applyLang();
 };
 $("settings").addEventListener("change", e => {
   const el = e.target;
@@ -456,6 +472,7 @@ chrome.storage.sync.get(["char", "settings"], async data => {
   // Show the cached profile right away, then refresh it from Raider.io
   ({ profile = null } = await chrome.storage.local.get("profile"));
   if (char) ["region", "realm", "name"].forEach(k => $(k).value = char[k] || "");
+  applyTheme(settings.theme);
   applyLang();
   show(char ? "links" : "config");
   refreshProfile();

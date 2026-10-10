@@ -13,6 +13,7 @@ A browser extension (Chrome, Edge and other Chromium browsers) for **World of Wa
 - **Realm autocomplete:** suggests realms of the selected region from Blizzard's official realm list while you type, however you spell them ("moonguard" finds Moon Guard).
 - **Options (⚙):**
   - Language: English or Spanish (the Armory opens in the same language).
+  - Theme: Gold, Arcane, Frost or Fel.
   - Choose which links to show or hide.
   - Open links in the background.
   - Show or hide keyboard shortcuts.

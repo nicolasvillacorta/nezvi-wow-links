@@ -53,6 +53,7 @@ FEATURES
 • Keyboard shortcuts: press 1–9 to open a link.
 • Copy your Name-Realm in the in-game format, ready for /invite or /w.
 • Choose which links to show and open them in the background if you prefer.
+• Four themes: Gold, Arcane, Frost and Fel.
 • Available in English and Spanish.
 • Settings sync across your browsers.
 
@@ -86,6 +87,7 @@ FUNCIONES
 • Atajos de teclado: apretá 1–9 para abrir un link.
 • Copiá tu Nombre-Reino en el formato del juego, listo para /invite o /w.
 • Elegí qué links mostrar y abrilos en segundo plano si preferís.
+• Cuatro temas: Oro, Arcano, Escarcha y Vil.
 • Disponible en español e inglés.
 • La configuración se sincroniza entre tus navegadores.
 
