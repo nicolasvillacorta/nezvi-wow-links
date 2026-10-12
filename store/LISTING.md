@@ -48,18 +48,19 @@ FEATURES
 • Your in-game avatar and class color in the popup.
 • Save all your alts and switch between them in one click (or with the arrow keys).
 • Your Mythic+ score, item level and current raid progress at a glance.
+• Best keys panel: your best key per dungeon this season and how far you are from the title.
 • Realm autocomplete while you set up your character.
 • Player lookup: paste Name-Realm copied in game and Raider.io opens instantly, with your recent searches one click away.
 • Open the popup with Alt+Shift+R.
 • Keyboard shortcuts: press 1–9 to open a link.
 • Copy your Name-Realm in the in-game format, ready for /invite or /w.
 • Choose which links to show and open them in the background if you prefer.
-• Three styles (Modern, Classic in-game look, Minimal) and four colors (Gold, Arcane, Frost, Fel).
+• Three styles (Modern, Classic in-game look, Minimal), four colors (Gold, Arcane, Frost, Fel) and three sizes, plus a compact mode.
 • Available in English and Spanish.
 • Settings sync across your browsers.
 
 PRIVACY
-No accounts, no tracking, no ads. Your character is stored in your browser, and only your region, realm and character name are sent to the public Raider.io API to detect your guild.
+No accounts, no tracking, no ads. Your characters are stored in your browser, and only their region, realm and name are sent to the public Raider.io API to show their guild and stats.
 
 Nezvi WoW is a fan-made project and isn't affiliated with or endorsed by Blizzard Entertainment, Raider.io, Warcraft Logs or the other linked sites. World of Warcraft is a trademark of Blizzard Entertainment, Inc.
 ```
@@ -83,18 +84,19 @@ FUNCIONES
 • El avatar y el color de clase de tu personaje en el popup.
 • Guardá todos tus alters y cambiá entre ellos con un clic (o con las flechas del teclado).
 • Tu puntaje de Mítica+, nivel de objeto y progreso en la raid actual de un vistazo.
+• Panel de mejores llaves: tu mejor llave por mazmorra en la temporada y cuánto te falta para el título.
 • Autocompletado de reinos al configurar tu personaje.
 • Buscador de jugadores: pegá Nombre-Reino copiado del juego y se abre su Raider.io al instante, con tus búsquedas recientes a un clic.
 • Abrí el popup con Alt+Shift+R.
 • Atajos de teclado: apretá 1–9 para abrir un link.
 • Copiá tu Nombre-Reino en el formato del juego, listo para /invite o /w.
 • Elegí qué links mostrar y abrilos en segundo plano si preferís.
-• Tres estilos (Moderno, Clásico al estilo del juego, Minimal) y cuatro colores (Oro, Arcano, Escarcha, Vil).
+• Tres estilos (Moderno, Clásico al estilo del juego, Minimal), cuatro colores (Oro, Arcano, Escarcha, Vil) y tres tamaños, más un modo compacto.
 • Disponible en español e inglés.
 • La configuración se sincroniza entre tus navegadores.
 
 PRIVACIDAD
-Sin cuentas, sin rastreo y sin publicidad. Tu personaje se guarda en tu navegador, y solo se envían tu región, reino y nombre a la API pública de Raider.io para detectar tu guild.
+Sin cuentas, sin rastreo y sin publicidad. Tus personajes se guardan en tu navegador, y solo se envían su región, reino y nombre a la API pública de Raider.io para mostrar su guild y sus estadísticas.
 
 Nezvi WoW es un proyecto hecho por fans y no está afiliado ni respaldado por Blizzard Entertainment, Raider.io, Warcraft Logs ni los demás sitios enlazados. World of Warcraft es una marca registrada de Blizzard Entertainment, Inc.
 ```
@@ -116,13 +118,13 @@ WoW guild
 **Single purpose / extension purpose**
 
 ```text
-Gives World of Warcraft players quick links to their character's and guild's public profiles on sites like Raider.io, Warcraft Logs and the WoW Armory.
+Gives World of Warcraft players quick access to the public profiles of their characters, their guild and players they look up, on sites like Raider.io, Warcraft Logs and the WoW Armory.
 ```
 
 **Permission justification — storage**
 
 ```text
-Saves the character the user enters (region, realm and name) and the user's preferences (language, visible links), so they don't need to be entered every time the popup opens.
+Saves the characters the user enters (region, realm and name), their preferences (language, visible links, appearance) and their last 5 player lookups, so they don't need to be entered every time the popup opens. Cached Raider.io data is kept locally to show it instantly.
 ```
 
 **Permission justification — host permission (https://raider.io/*)**
@@ -146,5 +148,7 @@ No account or login is needed.
 1. Click the extension icon in the toolbar.
 2. Choose region "US", realm "<YOUR REALM>" and character "<YOUR CHARACTER>", and click Save.
 3. The popup shows links to Raider.io, Warcraft Logs, Armory and WoWProgress. The guild, class color and avatar are detected automatically from the Raider.io API.
-4. Press 1–6 or click a link to open it. The gear icon opens the options (language, visible links, open in background).
+4. Press 1–6 or click a link to open it. The gear icon opens the options (language, visible links, appearance).
+5. Player lookup: click the magnifier and type or paste a character as Name-Realm (for example the same character you set up); its Raider.io page opens.
+6. Alts: click the character name in the header, choose "+ Add character" and save another one; switch between them from that menu or with the left/right arrow keys.
 ```
