@@ -29,76 +29,64 @@ Taken from `manifest.json` (read-only in the store):
 
 > Your character's Raider.io, Warcraft Logs, Armory and more, one click away.
 
+> **Chrome rule (keyword stuffing):** the description may name at most 5 brands or sites. Version 1.2 was rejected for listing every supported site. Name only a few and link to the README for the full list (the screenshots can show the rest).
+
 ## Description — English
 
 ```text
-Nezvi WoW gives World of Warcraft players one-click access to their character's profiles on the sites they check every day.
+Nezvi WoW gives World of Warcraft players one-click access to their characters' profiles on the sites they check every day, like Raider.io and Warcraft Logs.
 
-Set up your character once (region, realm and name) and the extension builds the links for you:
-
-• Raider.io
-• Warcraft Logs
-• World of Warcraft Armory
-• WoWProgress
-• Simple Armory and Data for Azeroth (optional)
+Set up your character once (region, realm and name) and the extension builds the links for you. You choose which sites to show; see the full list at https://github.com/nicolasvillacorta/nezvi-wow-links#features
 
 FEATURES
-• Automatic guild detection: your guild is looked up on Raider.io, including guilds on connected realms.
-• Guild links to Raider.io and Warcraft Logs (WoWProgress and the Armory are optional).
+• Automatic guild detection, including guilds on connected realms, with links to your guild's pages.
 • Your in-game avatar and class color in the popup.
 • Save all your alts and switch between them in one click (or with the arrow keys).
 • Your Mythic+ score, item level and current raid progress at a glance.
 • Best keys panel: your best key per dungeon this season and how far you are from the title.
 • Realm autocomplete while you set up your character.
-• Player lookup: paste Name-Realm copied in game and Raider.io opens instantly, with your recent searches one click away.
+• Player lookup: paste Name-Realm copied in game and their profile opens instantly, with your recent searches one click away.
 • Open the popup with Alt+Shift+R.
 • Keyboard shortcuts: press 1–9 to open a link.
 • Copy your Name-Realm in the in-game format, ready for /invite or /w.
-• Choose which links to show and open them in the background if you prefer.
-• Three styles (Modern, Classic in-game look, Minimal), four colors (Gold, Arcane, Frost, Fel) and three sizes, plus a compact mode.
+• Open links in the background if you prefer.
+• Three styles (Modern, Classic in-game look, Minimal), four colors and three sizes, plus a compact mode.
 • Available in English and Spanish.
 • Settings sync across your browsers.
 
 PRIVACY
 No accounts, no tracking, no ads. Your characters are stored in your browser, and only their region, realm and name are sent to the public Raider.io API to show their guild and stats.
 
-Nezvi WoW is a fan-made project and isn't affiliated with or endorsed by Blizzard Entertainment, Raider.io, Warcraft Logs or the other linked sites. World of Warcraft is a trademark of Blizzard Entertainment, Inc.
+Nezvi WoW is a fan-made project and isn't affiliated with or endorsed by Blizzard Entertainment or the sites it links to.
 ```
 
 ## Descripción — Español
 
 ```text
-Nezvi WoW te da acceso con un click a los perfiles de tu personaje de World of Warcraft en los sitios que revisás todos los días.
+Nezvi WoW te da acceso con un click a los perfiles de tus personajes de World of Warcraft en los sitios que revisás todos los días, como Raider.io y Warcraft Logs.
 
-Configurás tu personaje una sola vez (región, reino y nombre) y la extensión arma los links por vos:
-
-• Raider.io
-• Warcraft Logs
-• Armería de World of Warcraft
-• WoWProgress
-• Simple Armory y Data for Azeroth (opcionales)
+Configurás tu personaje una sola vez (región, reino y nombre) y la extensión arma los links por vos. Vos elegís qué sitios mostrar; la lista completa está en https://github.com/nicolasvillacorta/nezvi-wow-links#features
 
 FUNCIONES
-• Detección automática de la guild desde Raider.io, incluso en reinos conectados.
-• Links de la guild a Raider.io y Warcraft Logs (WoWProgress y la Armería son opcionales).
+• Detección automática de la guild, incluso en reinos conectados, con links a las páginas de tu guild.
 • El avatar y el color de clase de tu personaje en el popup.
 • Guardá todos tus alters y cambiá entre ellos con un clic (o con las flechas del teclado).
 • Tu puntaje de Mítica+, nivel de objeto y progreso en la raid actual de un vistazo.
 • Panel de mejores llaves: tu mejor llave por mazmorra en la temporada y cuánto te falta para el título.
 • Autocompletado de reinos al configurar tu personaje.
-• Buscador de jugadores: pegá Nombre-Reino copiado del juego y se abre su Raider.io al instante, con tus búsquedas recientes a un clic.
+• Buscador de jugadores: pegá Nombre-Reino copiado del juego y se abre su perfil al instante, con tus búsquedas recientes a un clic.
 • Abrí el popup con Alt+Shift+R.
 • Atajos de teclado: apretá 1–9 para abrir un link.
 • Copiá tu Nombre-Reino en el formato del juego, listo para /invite o /w.
-• Elegí qué links mostrar y abrilos en segundo plano si preferís.
-• Tres estilos (Moderno, Clásico al estilo del juego, Minimal), cuatro colores (Oro, Arcano, Escarcha, Vil) y tres tamaños, más un modo compacto.
+• Abrí los links en segundo plano si preferís.
+• Tres estilos (Moderno, Clásico al estilo del juego, Minimal), cuatro colores y tres tamaños, más un modo compacto.
 • Disponible en español e inglés.
 • La configuración se sincroniza entre tus navegadores.
 
 PRIVACIDAD
 Sin cuentas, sin rastreo y sin publicidad. Tus personajes se guardan en tu navegador, y solo se envían su región, reino y nombre a la API pública de Raider.io para mostrar su guild y sus estadísticas.
 
-Nezvi WoW es un proyecto hecho por fans y no está afiliado ni respaldado por Blizzard Entertainment, Raider.io, Warcraft Logs ni los demás sitios enlazados. World of Warcraft es una marca registrada de Blizzard Entertainment, Inc.
+Nezvi WoW es un proyecto hecho por fans y no está afiliado ni respaldado por Blizzard Entertainment ni por los sitios que enlaza.
 ```
 
 ## Search terms (Edge, up to 7)
